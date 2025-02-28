@@ -82,8 +82,8 @@ const NavItem: React.FC<NavItemProps> = ({ name, link, isActive, onClick }) => {
 // Searchable Content Items (example data)
 // ------------------------
 const contentItems = [
-  { id: 1, title: "Product", url: "#product" },
-  { id: 2, title: "About Nutcha Bite", url: "#about" },
+  { id: 1, title: "About", url: "#about" },
+  { id: 2, title: "Menu", url: "#menu" },
   { id: 3, title: "Testimonials", url: "#testimonials" },
   { id: 4, title: "FAQ", url: "#faq" },
   { id: 5, title: "Contact", url: "#contact" },

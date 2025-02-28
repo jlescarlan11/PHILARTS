@@ -231,9 +231,9 @@ const HeroSection: React.FC = () => {
         <div className="z-10 absolute bottom-8 w-full flex justify-center">
           <HashLink
             smooth
-            to="#product"
+            to="#about"
             title="Scroll Down"
-            aria-label="Scroll down"
+            aria-label="Scroll Down to About"
             className="animate-bounce text-[var(--color-tertiary)]"
           >
             <svg
