@@ -1,0 +1,122 @@
+@import "https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:wght@400;700&display=swap";
+@import "tailwindcss";
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary: hsla(33, 50%, 90%);
+  --color-primary-90: hsla(33, 50%, 90%, 0.9);
+  --color-primary-80: hsla(33, 50%, 90%, 0.8);
+  --color-primary-70: hsla(33, 50%, 90%, 0.7);
+  --color-primary-60: hsla(33, 50%, 90%, 0.6);
+  --color-primary-50: hsla(33, 50%, 90%, 0.5);
+  --color-primary-40: hsla(33, 50%, 90%, 0.4);
+  --color-primary-30: hsla(33, 50%, 90%, 0.3);
+  --color-primary-20: hsla(33, 50%, 90%, 0.2);
+  --color-primary-10: hsla(33, 50%, 90%, 0.1);
+
+  /* Secondary Colors */
+  --color-secondary: hsl(33, 50%, 10%);
+  --color-secondary-90: hsla(33, 50%, 10%, 0.9);
+  --color-secondary-80: hsla(33, 50%, 10%, 0.8);
+  --color-secondary-70: hsla(33, 50%, 10%, 0.7);
+  --color-secondary-60: hsla(33, 50%, 10%, 0.6);
+  --color-secondary-50: hsla(33, 50%, 10%, 0.5);
+  --color-secondary-40: hsla(33, 50%, 10%, 0.4);
+  --color-secondary-30: hsla(33, 50%, 10%, 0.3);
+  --color-secondary-20: hsla(33, 50%, 10%, 0.2);
+  --color-secondary-10: hsla(33, 50%, 10%, 0.1);
+
+  /* Tertiary Colors (Now Green) */
+  --color-tertiary: hsl(93, 80%, 20%);
+  --color-tertiary-90: hsla(93, 80%, 20%, 0.9);
+  --color-tertiary-80: hsla(93, 80%, 20%, 0.8);
+  --color-tertiary-70: hsla(93, 80%, 20%, 0.7);
+  --color-tertiary-60: hsla(93, 80%, 20%, 0.6);
+  --color-tertiary-50: hsla(93, 80%, 20%, 0.5);
+  --color-tertiary-40: hsla(93, 80%, 20%, 0.4);
+  --color-tertiary-30: hsla(93, 80%, 20%, 0.3);
+  --color-tertiary-20: hsla(93, 80%, 20%, 0.2);
+  --color-tertiary-10: hsla(93, 80%, 20%, 0.1);
+
+  /* Accent Colors (Now Red/Pink) */
+  --color-accent: hsl(333, 80%, 20%);
+  --color-accent-90: hsla(333, 80%, 20%, 0.9);
+  --color-accent-80: hsla(333, 80%, 20%, 0.8);
+  --color-accent-70: hsla(333, 80%, 20%, 0.7);
+  --color-accent-60: hsla(333, 80%, 20%, 0.6);
+  --color-accent-50: hsla(333, 80%, 20%, 0.5);
+  --color-accent-40: hsla(333, 80%, 20%, 0.4);
+  --color-accent-30: hsla(333, 80%, 20%, 0.3);
+  --color-accent-20: hsla(333, 80%, 20%, 0.2);
+  --color-accent-10: hsla(333, 80%, 20%, 0.1);
+
+  background-color: var(--color-primary);
+  line-height: 1.5;
+  font-weight: 400;
+  --nav-height: 4rem;
+}
+.dark {
+  /* Primary Colors */
+  --color-primary: hsla(33, 50%, 10%);
+  --color-primary-90: hsla(33, 50%, 10%, 0.9);
+  --color-primary-80: hsla(33, 50%, 10%, 0.8);
+  --color-primary-70: hsla(33, 50%, 10%, 0.7);
+  --color-primary-60: hsla(33, 50%, 10%, 0.6);
+  --color-primary-50: hsla(33, 50%, 10%, 0.5);
+  --color-primary-40: hsla(33, 50%, 10%, 0.4);
+  --color-primary-30: hsla(33, 50%, 10%, 0.3);
+  --color-primary-20: hsla(33, 50%, 10%, 0.2);
+  --color-primary-10: hsla(33, 50%, 10%, 0.1);
+
+  /* Secondary Colors */
+  --color-secondary: hsl(33, 50%, 90%);
+  --color-secondary-90: hsla(33, 50%, 90%, 0.9);
+  --color-secondary-80: hsla(33, 50%, 90%, 0.8);
+  --color-secondary-70: hsla(33, 50%, 90%, 0.7);
+  --color-secondary-60: hsla(33, 50%, 90%, 0.6);
+  --color-secondary-50: hsla(33, 50%, 90%, 0.5);
+  --color-secondary-40: hsla(33, 50%, 90%, 0.4);
+  --color-secondary-30: hsla(33, 50%, 90%, 0.3);
+  --color-secondary-20: hsla(33, 50%, 90%, 0.2);
+  --color-secondary-10: hsla(33, 50%, 90%, 0.1);
+
+  /* Tertiary Colors (Now Green) */
+  --color-tertiary: hsl(93, 80%, 80%);
+  --color-tertiary-90: hsla(93, 80%, 80%, 0.9);
+  --color-tertiary-80: hsla(93, 80%, 80%, 0.8);
+  --color-tertiary-70: hsla(93, 80%, 80%, 0.7);
+  --color-tertiary-60: hsla(93, 80%, 80%, 0.6);
+  --color-tertiary-50: hsla(93, 80%, 80%, 0.5);
+  --color-tertiary-40: hsla(93, 80%, 80%, 0.4);
+  --color-tertiary-30: hsla(93, 80%, 80%, 0.3);
+  --color-tertiary-20: hsla(93, 80%, 80%, 0.2);
+  --color-tertiary-10: hsla(93, 80%, 80%, 0.1);
+
+  /* Accent Colors (Now Red/Pink) */
+  --color-accent: hsl(333, 80%, 80%);
+  --color-accent-90: hsla(333, 80%, 80%, 0.9);
+  --color-accent-80: hsla(333, 80%, 80%, 0.8);
+  --color-accent-70: hsla(333, 80%, 80%, 0.7);
+  --color-accent-60: hsla(333, 80%, 80%, 0.6);
+  --color-accent-50: hsla(333, 80%, 80%, 0.5);
+  --color-accent-40: hsla(333, 80%, 80%, 0.4);
+  --color-accent-30: hsla(333, 80%, 80%, 0.3);
+  --color-accent-20: hsla(333, 80%, 80%, 0.2);
+  --color-accent-10: hsla(333, 80%, 80%, 0.1);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@media print {
+  body * {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
