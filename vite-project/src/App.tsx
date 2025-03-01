@@ -4,12 +4,15 @@ import Navbar from "./component/NavBar";
 import HeroSection from "./component/HeroSection";
 import ProductShowcase from "./component/ProductShowcase";
 import AboutSection from "./component/AboutSection";
+import TestimonialsSection from "./component/TestimonialsSection";
+import FAQSection from "./component/FAQSection";
+import Cart from "./component/Cart";
 
 const App: React.FC = () => {
   return (
     <Router>
       <Navbar />
-      <main className="">
+      <main>
         <Routes>
           <Route
             path="/"
@@ -24,9 +27,16 @@ const App: React.FC = () => {
                 <section id="menu">
                   <ProductShowcase />
                 </section>
+                <section id="testimonials">
+                  <TestimonialsSection />
+                </section>
+                <section id="faq">
+                  <FAQSection />
+                </section>
               </div>
             }
           />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </main>
     </Router>

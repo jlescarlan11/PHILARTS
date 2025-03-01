@@ -1,570 +1,782 @@
-import React, { useState, useEffect, useRef } from "react";
-import { HashLink } from "react-router-hash-link";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  KeyboardEvent,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import heroImage from "../assets/hero-image.webp";
+import { useCart } from "../hooks/useCart";
+import { CartItem } from "../hooks/useCart";
 
-/* -------------------------------------------------------
-   Enhanced Analytics Tracker Utility
--------------------------------------------------------- */
-const trackEvent = (eventName: string, details: Record<string, any>) => {
-  try {
-    if (window.gtag) {
-      window.gtag("event", eventName, details);
-    } else if (process.env.NODE_ENV === "development") {
-      console.warn("Analytics not available", eventName, details);
-    }
-  } catch (error) {
-    console.error("Analytics tracking error:", error, eventName, details);
-  }
-};
-
-/* -------------------------------------------------------
-   useOnScreen Hook
-   Detects if an element is visible using IntersectionObserver.
--------------------------------------------------------- */
-const useOnScreen = (
-  ref: React.RefObject<HTMLElement | null>,
-  threshold = 0.5
-) => {
-  const [isVisible, setIsVisible] = useState(false);
-  useEffect(() => {
-    if (!("IntersectionObserver" in window)) {
-      setIsVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => {
-      if (ref.current) observer.unobserve(ref.current);
-    };
-  }, [ref, threshold]);
-  return isVisible;
-};
-
-/* -------------------------------------------------------
-   useResponsiveImage Hook
-   Manages lazy-loading, error fallback, and responsive delivery.
--------------------------------------------------------- */
-const useResponsiveImage = (baseUrl: string) => {
-  const [src, setSrc] = useState(`${baseUrl}.webp`);
-  const [hasError, setHasError] = useState(false);
-  const handleError = () => {
-    if (!hasError) {
-      setSrc(`${baseUrl}.jpg`);
-      setHasError(true);
-    }
-  };
-  return { src, hasError, handleError };
-};
-
-/* -------------------------------------------------------
-   ResponsiveImage Component
-   Uses the <picture> element for WebP with JPEG fallback.
--------------------------------------------------------- */
-interface ResponsiveImageProps {
-  baseUrl: string;
-  alt: string;
-  className?: string;
-}
-const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
-  baseUrl,
-  alt,
-  className,
-}) => {
-  const { src, handleError } = useResponsiveImage(baseUrl);
-  return (
-    <picture>
-      <source srcSet={`${baseUrl}.webp`} type="image/webp" />
-      <source srcSet={`${baseUrl}.jpg`} type="image/jpeg" />
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        onError={handleError}
-        srcSet={`${baseUrl}.webp 1x, ${baseUrl}@2x.webp 2x`}
-        sizes="(max-width: 640px) 100vw, 33vw"
-        className={className}
-      />
-    </picture>
-  );
-};
-
-/* -------------------------------------------------------
-   Cart Utility
-   Adds a product to the shopping cart stored in localStorage.
--------------------------------------------------------- */
-interface Product {
-  id: number;
-  title: string;
+// -------------------------
+// Type Definitions
+// -------------------------
+export interface Product {
+  id: string;
+  name: string;
   description: string;
   price: number;
-  image: string; // Base path without extension (e.g., "/images/product1")
-  details: string;
-  rating: number;
-  reviews: number;
+  image: string;
+  sizes: { label: string; priceAdjustment: number }[];
+  trustBadges?: string[];
+  aggregateRating?: number;
+  availability?: string;
 }
-const addProductToCart = (product: Product) => {
-  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  cart.push(product);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  trackEvent("add_to_cart", { productId: product.id, title: product.title });
+
+// -------------------------
+// Sample Product Data
+// -------------------------
+const products: Product[] = [
+  {
+    id: "1",
+    name: "Nutcha Bite Deluxe",
+    description:
+      "Indulge in our Nutcha Bite Deluxe – a delightful fusion of traditional Iloilo flavors with a modern matcha twist. Experience culinary bliss!",
+    price: 12.99,
+    image: `${heroImage}`, // already a .webp image
+    sizes: [
+      { label: "Small", priceAdjustment: 0 },
+      { label: "Medium", priceAdjustment: 2 },
+      { label: "Large", priceAdjustment: 4 },
+    ],
+    trustBadges: ["Bestseller", "Free Shipping"],
+    aggregateRating: 4.5,
+    availability: "InStock",
+  },
+  {
+    id: "2",
+    name: "Nutcha Bite Classic",
+    description:
+      "Savor the timeless taste of our Nutcha Bite Classic – a perfect blend of heritage and innovation. A must-try favorite!",
+    price: 9.99,
+    image: "/images/product2", // assumed .webp
+    sizes: [
+      { label: "Regular", priceAdjustment: 0 },
+      { label: "Family Pack", priceAdjustment: 3 },
+    ],
+    trustBadges: ["Customer Favorite"],
+    aggregateRating: 4.3,
+    availability: "InStock",
+  },
+];
+
+// -------------------------
+// Custom Hook: useResponsiveImage
+// Uses the provided image URL (assumed to be .webp) and handles load errors.
+// On error, updates the error state so ARIA live regions can notify the user.
+const useResponsiveImage = (imageUrl: string) => {
+  // Use the URL as provided; no fallback is applied.
+  const [src] = useState(imageUrl);
+  const [error, setError] = useState(false);
+  const handleError = () => {
+    if (!error) {
+      setError(true);
+    }
+  };
+  return { src, handleError, error };
 };
 
-/* -------------------------------------------------------
-   CartModal Component
-   Displays a modal confirming that a product has been added to the cart.
--------------------------------------------------------- */
-interface CartModalProps {
-  product: Product;
-  onClose: () => void;
+// -------------------------
+// Custom Hook: useCart
+// Manages cart state, persists it in localStorage, and stacks identical items.
+
+// -------------------------
+// Custom Hook: useFocusTrap
+// Traps focus within a modal dialog.
+const useFocusTrap = (modalRef: React.RefObject<HTMLDivElement | null>) => {
+  useEffect(() => {
+    const focusableSelectors = [
+      "a[href]",
+      "button:not([disabled])",
+      "textarea:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+    ].join(",");
+    const modal = modalRef.current;
+    if (!modal) return;
+    const focusableElements =
+      modal.querySelectorAll<HTMLElement>(focusableSelectors);
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const handleKeyDown = (e: Event) => {
+      const keyboardEvent = e as unknown as KeyboardEvent;
+      if (keyboardEvent.key === "Tab") {
+        if (keyboardEvent.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+    modal.addEventListener("keydown", handleKeyDown);
+    firstElement?.focus();
+    return () => modal.removeEventListener("keydown", handleKeyDown);
+  }, [modalRef]);
+};
+
+// -------------------------
+// Analytics Helper (Debounced)
+// -------------------------
+const debounce = (func: Function, delay: number) => {
+  let timeoutId: number;
+  return (...args: any[]) => {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => func(...args), delay);
+  };
+};
+
+const trackEvent = debounce(
+  (eventName: string, details: Record<string, any>) => {
+    try {
+      const metadata = {
+        ...details,
+        deviceType: window.innerWidth < 768 ? "mobile" : "desktop",
+        sessionId: sessionStorage.getItem("sessionId") || "unknown",
+      };
+      if (window.gtag) {
+        window.gtag("event", eventName, metadata);
+      } else {
+        console.log(`Tracked Event: ${eventName}`, metadata);
+      }
+    } catch (error) {
+      console.error("Analytics tracking error:", error, eventName, details);
+    }
+  },
+  300
+);
+
+// -------------------------
+// CartConfirmationModal Component
+// Displays a confirmation after adding to cart with clear next-step options.
+interface CartConfirmationModalProps {
+  onViewCart: () => void;
+  onContinue: () => void;
+  onUndo: () => void;
 }
-const CartModal: React.FC<CartModalProps> = ({ product, onClose }) => {
+const CartConfirmationModal: React.FC<CartConfirmationModalProps> = ({
+  onViewCart,
+  onContinue,
+  onUndo,
+}) => {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useFocusTrap(modalRef);
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="cart-confirmation-title"
+      aria-describedby="cart-confirmation-desc"
     >
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black opacity-50"
-        onClick={onClose}
         aria-hidden="true"
       ></div>
-      <div className="relative bg-white p-6 rounded-lg max-w-sm w-full z-10">
-        <h3 className="text-2xl font-bold text-[var(--color-secondary)]">
-          Added to Cart!
+      <div
+        ref={modalRef}
+        className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300"
+      >
+        <h3
+          id="cart-confirmation-title"
+          className="text-2xl font-bold text-[var(--color-secondary)]"
+        >
+          Great Choice!
         </h3>
-        <p className="mt-2 text-[var(--color-secondary)]">
-          {product.title} has been added to your cart.
+        <p
+          id="cart-confirmation-desc"
+          className="mt-2 text-[var(--color-secondary)]"
+        >
+          Your product was added to your cart. Would you like to review your
+          cart or continue shopping?
         </p>
         <div className="mt-4 flex justify-end space-x-2">
           <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out ripple"
-            role="button"
-            aria-label="Continue Shopping"
+            onClick={onUndo}
+            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            aria-label="Undo the cart addition"
+          >
+            Undo
+          </button>
+          <button
+            onClick={onViewCart}
+            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            aria-label="Go to your cart to review your selections"
+          >
+            View Cart
+          </button>
+          <button
+            onClick={onContinue}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
+            aria-label="Continue browsing products"
           >
             Continue Shopping
           </button>
-          <HashLink
-            smooth
-            to="#cart"
-            onClick={onClose}
-            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out ripple"
-            role="button"
-            aria-label="View Cart"
-          >
-            View Cart
-          </HashLink>
         </div>
       </div>
     </div>
   );
 };
 
-interface QuickViewModalProps {
+// -------------------------
+// AddToCartModal Component
+// Modal for selecting product options with persuasive microcopy.
+interface AddToCartModalProps {
   product: Product;
   onClose: () => void;
+  onConfirm: (size: string, quantity: number) => void;
 }
-const QuickViewModal: React.FC<QuickViewModalProps> = ({
+const AddToCartModal: React.FC<AddToCartModalProps> = ({
   product,
   onClose,
+  onConfirm,
 }) => {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useFocusTrap(modalRef);
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0].label);
+  const [quantity, setQuantity] = useState(1);
+  const [ariaMsg, setAriaMsg] = useState("");
+
+  useEffect(() => {
+    setAriaMsg(`Selected size: ${selectedSize}, Quantity: ${quantity}`);
+  }, [selectedSize, quantity]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="add-to-cart-title"
+      aria-describedby="add-to-cart-desc"
     >
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black opacity-50"
         onClick={onClose}
         aria-hidden="true"
       ></div>
-      <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10">
-        <h3 className="text-2xl font-bold text-[var(--color-secondary)]">
-          {product.title}
-        </h3>
-        <p className="mt-2 text-[var(--color-secondary)]">
-          {product.description}
-        </p>
-        <p className="mt-2 text-lg font-semibold text-[var(--color-accent)]">
-          ${product.price.toFixed(2)}
-        </p>
-        <p className="mt-2 text-sm text-gray-600">{product.details}</p>
-        <button
-          onClick={onClose}
-          className="mt-4 px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out ripple"
-          role="button"
-          aria-label="Close Quick View"
+      <div
+        ref={modalRef}
+        className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300"
+      >
+        <h3
+          id="add-to-cart-title"
+          className="text-2xl font-bold text-[var(--color-secondary)] mb-4"
         >
-          Close
-        </button>
+          Add to Your Cart
+        </h3>
+        <p id="add-to-cart-desc" className="mb-4 text-[var(--color-secondary)]">
+          Choose the perfect size and quantity for an unforgettable dining
+          experience.
+        </p>
+        <div aria-live="polite" className="sr-only">
+          {ariaMsg}
+        </div>
+        <div className="mb-4">
+          <label className="block text-[var(--color-secondary)] mb-1">
+            Size:
+          </label>
+          <select
+            value={selectedSize}
+            onChange={(e) => {
+              setSelectedSize(e.target.value);
+              trackEvent("size_selection_changed", {
+                productId: product.id,
+                size: e.target.value,
+              });
+            }}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            aria-label="Select the ideal size for your product"
+          >
+            {product.sizes.map((option, idx) => (
+              <option key={idx} value={option.label}>
+                {option.label}{" "}
+                {option.priceAdjustment > 0 &&
+                  `(+$${option.priceAdjustment.toFixed(2)})`}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-[var(--color-secondary)] mb-1">
+            Quantity:
+          </label>
+          <div className="flex">
+            <button
+              onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+              className="px-3 py-2 bg-gray-200 rounded-l hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
+              aria-label="Decrease the quantity"
+            >
+              –
+            </button>
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+              className="w-16 text-center border-t border-b border-gray-200 focus:outline-none"
+              min="1"
+              aria-label="Current quantity"
+            />
+            <button
+              onClick={() => setQuantity((prev) => prev + 1)}
+              className="px-3 py-2 bg-gray-200 rounded-r hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
+              aria-label="Increase the quantity"
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            aria-label="Cancel adding the product"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(selectedSize, quantity)}
+            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            aria-label="Confirm your selection and add to cart"
+          >
+            Confirm
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-/* -------------------------------------------------------
-   Sample Product Data
--------------------------------------------------------- */
-const products: Product[] = [
-  {
-    id: 1,
-    title: "Crunchy Delight",
-    description: "A crispy treat that will leave you wanting more.",
-    price: 9.99,
-    image: "/images/product1",
-    details:
-      "Crafted with a secret blend of spices and the freshest ingredients.",
-    rating: 4,
-    reviews: 87,
-  },
-  {
-    id: 2,
-    title: "Spicy Surprise",
-    description: "Experience the kick of our signature spice blend.",
-    price: 12.99,
-    image: "/images/product2",
-    details: "A perfect balance of heat and flavor to awaken your taste buds.",
-    rating: 5,
-    reviews: 112,
-  },
-  {
-    id: 3,
-    title: "Sweet Harmony",
-    description: "Indulge in the perfect blend of sweet and savory.",
-    price: 11.49,
-    image: "/images/product3",
-    details:
-      "Our chefs have perfected this recipe with decades of culinary expertise.",
-    rating: 4,
-    reviews: 95,
-  },
-  // Additional products...
-];
-
-/* -------------------------------------------------------
-   ProductCard Component
-   - Accessible product card with interactive buttons.
-   - Uses ResponsiveImage and tracks product impressions.
-   - Triggers onAddToCart callback when the product is added.
--------------------------------------------------------- */
-interface ProductCardProps {
+// -------------------------
+// ViewProductModal Component
+// Displays detailed product information with enhanced accessibility.
+interface ViewProductModalProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
+  onClose: () => void;
 }
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const isOnScreen = useOnScreen(cardRef, 0.5);
-  const [hasBeenImpressed, setHasBeenImpressed] = useState(false);
-  const [viewStartTime, setViewStartTime] = useState<number | null>(null);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [quickViewOpen, setQuickViewOpen] = useState(false);
-  const [favorite, setFavorite] = useState(
-    JSON.parse(localStorage.getItem(`favorite-${product.id}`) || "false")
-  );
-
-  // Track product impression once when visible
-  useEffect(() => {
-    if (isOnScreen && !hasBeenImpressed) {
-      trackEvent("product_impression", {
-        productId: product.id,
-        title: product.title,
-      });
-      setHasBeenImpressed(true);
-      setViewStartTime(Date.now());
-    }
-  }, [isOnScreen, hasBeenImpressed, product]);
-
-  // Track view duration on unmount
-  useEffect(() => {
-    return () => {
-      if (viewStartTime) {
-        const duration = Date.now() - viewStartTime;
-        trackEvent("product_view_duration", {
-          productId: product.id,
-          duration,
-        });
-      }
-    };
-  }, [viewStartTime, product]);
-
-  // Toggle tooltip visibility
-  const handleTooltipToggle = (visible: boolean) => {
-    setShowTooltip(visible);
-    trackEvent("product_tooltip", { productId: product.id, visible });
-  };
-
-  // Toggle favorite state with persistence
-  const toggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    const newFav = !favorite;
-    setFavorite(newFav);
-    localStorage.setItem(`favorite-${product.id}`, JSON.stringify(newFav));
-    trackEvent("toggle_favorite", { productId: product.id, favorite: newFav });
-  };
-
-  // Open Quick View modal
-  const openQuickView = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    setQuickViewOpen(true);
-    trackEvent("quick_view_click", {
-      productId: product.id,
-      title: product.title,
-    });
-  };
-  const closeQuickView = () => setQuickViewOpen(false);
-
-  // Handle Add to Cart by invoking callback (modal will be shown by parent)
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    onAddToCart(product);
-  };
-
+const ViewProductModal: React.FC<ViewProductModalProps> = ({
+  product,
+  onClose,
+}) => {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useFocusTrap(modalRef);
+  const { src, handleError, error } = useResponsiveImage(product.image);
   return (
-    <>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="view-product-title"
+      aria-describedby="view-product-desc"
+    >
       <div
-        ref={cardRef}
-        className="group relative bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 focus-within:scale-105 focus-within:shadow-xl"
-        onMouseEnter={() => handleTooltipToggle(true)}
-        onMouseLeave={() => handleTooltipToggle(false)}
-        onFocus={() => handleTooltipToggle(true)}
-        onBlur={() => handleTooltipToggle(false)}
-        tabIndex={0}
-        aria-describedby={`tooltip-${product.id}`}
-        role="article"
+        className="absolute inset-0 bg-black opacity-50"
+        onClick={onClose}
+        aria-hidden="true"
+      ></div>
+      <div
+        ref={modalRef}
+        className="relative bg-white p-6 rounded-lg max-w-3xl w-full z-10 transition-transform duration-300"
       >
-        <ResponsiveImage
-          baseUrl={product.image}
-          alt={`Nutcha Bite product: ${product.title}. ${product.description}`}
-          className="w-full h-48 object-cover"
-        />
-
-        <div className="p-4">
-          <h3 className="text-xl font-bold text-[var(--color-secondary)]">
-            {product.title}
-          </h3>
-          <p className="mt-2 text-[var(--color-secondary)]">
-            {product.description}
-          </p>
-          <p className="mt-2 text-lg font-semibold text-[var(--color-accent)]">
-            ${product.price.toFixed(2)}
-          </p>
-          {/* Star Ratings & Review Count */}
-          <div className="mt-2 flex items-center">
-            <div className="flex">
-              {Array.from({ length: 5 }, (_, i) => (
-                <svg
-                  key={i}
-                  className={`h-4 w-4 ${
-                    i < product.rating ? "text-yellow-400" : "text-gray-300"
-                  }`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.953a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118L10 13.011l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.64 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.953z" />
-                </svg>
-              ))}
+        <h3
+          id="view-product-title"
+          className="text-2xl font-bold text-[var(--color-secondary)] mb-4"
+        >
+          {product.name}
+        </h3>
+        <div id="view-product-desc" className="flex flex-col sm:flex-row">
+          <img
+            src={src}
+            alt={`${product.name} detailed view`}
+            onError={handleError}
+            loading="lazy"
+            className="w-full sm:w-1/2 h-auto object-cover rounded mb-4 sm:mb-0 sm:mr-4"
+          />
+          {error && (
+            <div role="alert" aria-live="assertive" className="text-red-600">
+              We’re sorry – this product image failed to load. Please try again
+              later.
             </div>
-            <span className="ml-2 text-sm text-[var(--color-secondary)]">
-              ({product.reviews})
-            </span>
+          )}
+          <div>
+            <p className="text-lg text-[var(--color-secondary)] mb-2">
+              {product.description}
+            </p>
+            <p className="text-xl font-semibold text-[var(--color-accent)] mb-2">
+              ${product.price.toFixed(2)}
+            </p>
+            {product.trustBadges && (
+              <div className="mb-2">
+                {product.trustBadges.map((badge, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded mr-2"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="text-sm text-gray-600">
+              Rating: {product.aggregateRating} / 5
+            </p>
+            <p className="text-sm text-gray-600">
+              Availability: {product.availability}
+            </p>
           </div>
         </div>
-
-        {/* Accessible Tooltip */}
-        <div
-          id={`tooltip-${product.id}`}
-          role="tooltip"
-          className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-[var(--color-tertiary)] text-white text-sm px-2 py-1 rounded transition-opacity duration-300 ${
-            showTooltip ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          {product.details}
-          <span className="sr-only"> – {product.title} additional details</span>
-        </div>
-
-        {/* Interactive Buttons */}
-        <div className="absolute top-2 right-2 flex flex-col space-y-2">
+        <div className="mt-4 flex justify-end">
           <button
-            onClick={openQuickView}
-            className="p-2 bg-[var(--color-accent)] text-white rounded-full focus:outline-none transition transform hover:scale-110 ripple"
-            role="button"
-            aria-label={`Quick View for ${product.title}`}
-            tabIndex={0}
+            onClick={onClose}
+            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            aria-label="Close the product details"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={handleAddToCart}
-            className="p-2 bg-[var(--color-accent)] text-white rounded-full focus:outline-none transition transform hover:scale-110 ripple"
-            role="button"
-            aria-label={`Add ${product.title} to Cart`}
-            tabIndex={0}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.293 2.293a1 1 0 00-.207.707V19a1 1 0 001 1h12a1 1 0 001-1v-3.293a1 1 0 00-.207-.707L17 13M7 13l10 0"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={toggleFavorite}
-            className="p-2 bg-[var(--color-accent)] text-white rounded-full focus:outline-none transition transform hover:scale-110 ripple"
-            role="button"
-            aria-label={
-              favorite
-                ? `Remove ${product.title} from Favorites`
-                : `Add ${product.title} to Favorites`
-            }
-            tabIndex={0}
-          >
-            {favorite ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-red-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 "
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-              </svg>
-            )}
+            Close
           </button>
         </div>
       </div>
-      {quickViewOpen && (
-        <QuickViewModal product={product} onClose={closeQuickView} />
-      )}
-    </>
+    </div>
   );
 };
 
-/* -------------------------------------------------------
-   ProductShowcase Component
-   Renders a grid of ProductCards and manages the CartModal.
--------------------------------------------------------- */
-const ProductShowcase: React.FC = () => {
-  // State to track which product was last added to cart for modal display.
-  const [cartModalProduct, setCartModalProduct] = useState<Product | null>(
-    null
-  );
+// -------------------------
+// ProductCard Component
+// Displays a full-image card with background set to the product image, gradient overlay, and interactive icons.
+// Updated ProductCard Component with increased height
+interface ProductCardProps {
+  product: Product;
+  onAddToCart: (product: Product) => void;
+  onViewProduct: (product: Product) => void;
+  onToggleFavorite: (product: Product) => void;
+  isFavorite: boolean;
+  cartCount?: number;
+}
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  onAddToCart,
+  onViewProduct,
+  onToggleFavorite,
+  isFavorite,
+  cartCount,
+}) => {
+  const { src, handleError, error } = useResponsiveImage(product.image);
 
-  // onAddToCart callback invoked by ProductCard.
-  const handleAddToCart = (product: Product) => {
-    // Add product to cart (persisted in localStorage)
-    addProductToCart(product);
-    // Show the CartModal by setting the product state
-    setCartModalProduct(product);
-  };
-
-  // Close the CartModal
-  const closeCartModal = () => setCartModalProduct(null);
+  // Track product card view event.
+  useEffect(() => {
+    trackEvent("product_card_view", { productId: product.id });
+  }, [product.id]);
 
   return (
-    <section
-      id="products"
-      className="bg-[var(--color-primary)] py-16"
-      role="region"
-      aria-label="Product Showcase"
+    // Increased height: h-96 gives the card a taller dimension (approx. 384px)
+    <div
+      className="relative h-96 rounded-lg shadow-md p-4 transform transition-transform duration-300 hover:scale-105 overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: `url(${src})` }}
+      itemScope
+      itemType="https://schema.org/Product"
     >
+      {/* Transparent gradient overlay for readability */}
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/30 to-black/80"></div>
+      {/* Display error message for screen readers if the image fails */}
+      {error && (
+        <div role="alert" aria-live="assertive" className="sr-only">
+          Unable to load product image.
+        </div>
+      )}
+      {/* Interactive icons with persuasive ARIA labels */}
+      <div className="absolute top-4 right-4 flex flex-col space-y-2">
+        <button
+          onClick={() => onViewProduct(product)}
+          className="p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          aria-label={`Discover more about ${product.name}`}
+        >
+          {/* Eye Icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
+          </svg>
+        </button>
+        <button
+          onClick={() => onAddToCart(product)}
+          className="relative p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          aria-label={`Add ${product.name} to your cart now`}
+        >
+          {/* Cart Icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.293 2.293a1 1 0 00.293 1.414l1.414 1.414a1 1 0 001.414 0L12 15m0 0l4 4m-4-4l-4 4"
+            />
+          </svg>
+          {(cartCount ?? 0) > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+              {cartCount}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => onToggleFavorite(product)}
+          className="p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          aria-label={
+            isFavorite
+              ? `Remove ${product.name} from your favorites`
+              : `Add ${product.name} to your favorites`
+          }
+        >
+          {isFavorite ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-red-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5.121 19.364l-1.414-1.414a8 8 0 1111.314 0l-1.414 1.414a6 6 0 10-8.486 0z"
+              />
+            </svg>
+          )}
+        </button>
+      </div>
+      {/* Product details overlaid on the bottom */}
+      <div className="absolute bottom-4 left-4 right-4 text-white">
+        <h3 className="text-2xl font-bold">{product.name}</h3>
+        <p className="text-sm">{product.description}</p>
+        <p className="text-xs font-semibold mt-1">
+          ${product.price.toFixed(2)}
+        </p>
+        {product.trustBadges && (
+          <div className="mt-2">
+            {product.trustBadges.map((badge, idx) => (
+              <span
+                key={idx}
+                className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded mr-2"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// -------------------------
+// MiniCartBadge Component
+// Displays a real-time mini cart summary badge.
+const MiniCartBadge: React.FC<{ cartCount: number }> = ({ cartCount }) => (
+  <div className="absolute w-auto z-50 top-4 right-4 bg-[var(--color-accent)] text-white px-3 py-1 rounded-full shadow-lg">
+    {cartCount} Items
+  </div>
+);
+
+// -------------------------
+// Main Component: ProductShowcase
+// Displays the product grid and manages all modals and interactions.
+const ProductShowcase: React.FC = () => {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showAddToCartModal, setShowAddToCartModal] = useState(false);
+  const [showViewProductModal, setShowViewProductModal] = useState(false);
+  const [showCartConfirmationModal, setShowCartConfirmationModal] =
+    useState(false);
+  const { cartItems, addToCart, setCartItems } = useCart();
+  const navigate = useNavigate();
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("favorites");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+  const [previousCart, setPreviousCart] = useState<CartItem[]>([]);
+  const [ariaAnnouncement, setAriaAnnouncement] = useState<string>("");
+
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
+  const handleAddToCart = (product: Product) => {
+    setSelectedProduct(product);
+    setShowAddToCartModal(true);
+    trackEvent("add_to_cart_modal_open", { productId: product.id });
+  };
+
+  const handleConfirmAddToCart = (size: string, quantity: number) => {
+    if (selectedProduct) {
+      const sizeOption = selectedProduct.sizes.find((s) => s.label === size);
+      const finalPrice =
+        selectedProduct.price + (sizeOption ? sizeOption.priceAdjustment : 0);
+      const cartItem: CartItem = {
+        id: selectedProduct.id,
+        name: selectedProduct.name,
+        size,
+        price: finalPrice,
+        quantity,
+        image: selectedProduct.image,
+      };
+      setPreviousCart([...cartItems]);
+      addToCart(cartItem);
+      trackEvent("add_to_cart", {
+        productId: selectedProduct.id,
+        size,
+        quantity,
+      });
+      setShowAddToCartModal(false);
+      setShowCartConfirmationModal(true);
+      setAriaAnnouncement("Product successfully added to your cart.");
+    }
+  };
+
+  const handleUndoAddToCart = () => {
+    setCartItems(previousCart);
+    setShowCartConfirmationModal(false);
+    setAriaAnnouncement("Your last action was undone. Cart updated.");
+  };
+
+  const handleViewProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setShowViewProductModal(true);
+    trackEvent("view_product_modal_open", { productId: product.id });
+  };
+
+  const handleToggleFavorite = (product: Product) => {
+    setFavorites((prev) =>
+      prev.includes(product.id)
+        ? prev.filter((id) => id !== product.id)
+        : [...prev, product.id]
+    );
+    trackEvent("toggle_favorite", { productId: product.id });
+  };
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Product",
+        name: product.name,
+        description: product.description,
+        image: product.image,
+        offers: {
+          "@type": "Offer",
+          price: product.price.toFixed(2),
+          priceCurrency: "USD",
+          availability: `https://schema.org/${
+            product.availability || "InStock"
+          }`,
+        },
+        brand: { "@type": "Brand", name: "Nutcha Bite" },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: product.aggregateRating?.toString() || "4.5",
+          reviewCount: "120",
+        },
+      },
+    })),
+    keywords:
+      "Nutcha Bite, matcha, Iloilo delicacy, food, ordering, ingredients, dietary, support",
+  };
+
+  return (
+    <section id="products" className="relative py-16 bg-[var(--color-primary)]">
+      <MiniCartBadge cartCount={cartCount} />
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-secondary)] text-center mb-8">
-          Our Delicacies
+        <h2 className="text-4xl font-bold text-center mb-8 text-[var(--color-secondary)]">
+          Our Delicious Selections
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
               onAddToCart={handleAddToCart}
+              onViewProduct={handleViewProduct}
+              onToggleFavorite={handleToggleFavorite}
+              isFavorite={favorites.includes(product.id)}
+              cartCount={cartItems
+                .filter((ci) => ci.id === product.id)
+                .reduce((sum, ci) => sum + ci.quantity, 0)}
             />
           ))}
         </div>
       </div>
-      {/* Render the CartModal if a product was added */}
-      {cartModalProduct && (
-        <CartModal product={cartModalProduct} onClose={closeCartModal} />
-      )}
-      {/* JSON‑LD Structured Data for Products */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            itemListElement: products.map((product, index) => ({
-              "@type": "ListItem",
-              position: index + 1,
-              item: {
-                "@type": "Product",
-                name: product.title,
-                description: product.description,
-                image: `${product.image}.webp`,
-                offers: {
-                  "@type": "Offer",
-                  price: product.price.toFixed(2),
-                  priceCurrency: "USD",
-                  availability: "https://schema.org/InStock",
-                  url: `https://nutchabite.com/products/${product.id}`,
-                },
-                brand: {
-                  "@type": "Brand",
-                  name: "Nutcha Bite",
-                },
-                aggregateRating: {
-                  "@type": "AggregateRating",
-                  ratingValue: product.rating,
-                  reviewCount: product.reviews,
-                },
-              },
-            })),
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
+      {showAddToCartModal && selectedProduct && (
+        <AddToCartModal
+          product={selectedProduct}
+          onClose={() => setShowAddToCartModal(false)}
+          onConfirm={handleConfirmAddToCart}
+        />
+      )}
+      {showCartConfirmationModal && (
+        <CartConfirmationModal
+          onViewCart={() => {
+            setShowCartConfirmationModal(false);
+            navigate("/checkout");
+          }}
+          onContinue={() => setShowCartConfirmationModal(false)}
+          onUndo={handleUndoAddToCart}
+        />
+      )}
+      {showViewProductModal && selectedProduct && (
+        <ViewProductModal
+          product={selectedProduct}
+          onClose={() => setShowViewProductModal(false)}
+        />
+      )}
+      <div aria-live="polite" className="sr-only">
+        {ariaAnnouncement}
+      </div>
     </section>
   );
 };

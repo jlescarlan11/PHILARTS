@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HashLink } from "react-router-hash-link";
 import FocusLock from "react-focus-lock";
 import logo from "../assets/logo.svg";
-import { HiMoon, HiSun } from "react-icons/hi";
+import { HiMoon, HiShoppingCart, HiSun } from "react-icons/hi";
 
 // ----------------------
 // Utility: Throttle Hook
@@ -82,11 +82,11 @@ const NavItem: React.FC<NavItemProps> = ({ name, link, isActive, onClick }) => {
 // Searchable Content Items (example data)
 // ------------------------
 const contentItems = [
-  { id: 1, title: "About", url: "#about" },
-  { id: 2, title: "Menu", url: "#menu" },
-  { id: 3, title: "Testimonials", url: "#testimonials" },
-  { id: 4, title: "FAQ", url: "#faq" },
-  { id: 5, title: "Contact", url: "#contact" },
+  { id: 1, title: "About", url: "/#about" },
+  { id: 2, title: "Menu", url: "/#menu" },
+  { id: 3, title: "Testimonials", url: "/#testimonials" },
+  { id: 4, title: "FAQ", url: "/#faq" },
+  { id: 5, title: "Contact", url: "/#contact" },
 ];
 
 // Structured data (JSON‑LD) for SEO
@@ -312,6 +312,10 @@ const Navbar: React.FC = () => {
               ) : (
                 <HiMoon className="size-6" />
               )}
+            </button>
+
+            <button>
+              <HiShoppingCart className="size-6" />
             </button>
 
             <HashLink

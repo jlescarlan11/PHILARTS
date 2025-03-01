@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink } from "react-router-hash-link";
+import aboutImage from "../assets/hero-image.webp";
 
 /* -------------------------------------------------------
    Custom Hook: useInViewAnimation
@@ -51,20 +52,20 @@ const AboutVisual: React.FC = () => {
         {/* Low-res image for mobile */}
         <source
           media="(max-width: 640px)"
-          srcSet="/images/about-nutchabite-lowres.jpg"
+          srcSet={aboutImage}
           type="image/jpeg"
         />
         {/* High-res image for desktop */}
         <source
           media="(min-width: 641px)"
-          srcSet="/images/about-nutchabite-highres.jpg"
+          srcSet={aboutImage}
           type="image/jpeg"
         />
         <img
           src="/images/about-nutchabite-highres.jpg"
           alt="Nutcha Bite delicacy with a matcha twist, blending Iloilo tradition with modern flavor"
           loading="lazy"
-          className="rounded-lg shadow-lg w-full object-cover transition-transform duration-500 hover:scale-105"
+          className="rounded-lg shadow-lg w-full max-h-[500px] object-cover transition-transform duration-500 hover:scale-105"
         />
       </picture>
     </div>
@@ -103,7 +104,7 @@ const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
         refreshingly contemporary.
       </p>
       {/* Trust signal: Testimonial snippet */}
-      <div className="mb-6 p-4 border-l-4 border-[var(--color-tertiary)] bg-white bg-opacity-80 rounded shadow-sm">
+      <div className="mb-6 p-4 border-l-4 border-[var(--color-tertiary)] bg-[var(--color-tertiary-10)] bg-opacity-80 rounded shadow-sm">
         <p className="italic text-[var(--color-secondary)]">
           "Nutcha Bite transports me back to my childhood while introducing me
           to exciting new flavors. A true masterpiece!" – Satisfied Customer
@@ -116,7 +117,7 @@ const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
         title="Explore Our Menu"
         role="button"
         aria-label="Explore Our Menu"
-        className="inline-block mt-4 px-8 py-3 bg-[var(--color-tertiary)] text-white rounded-full focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)] hover:bg-opacity-90 transition duration-300 ease-in-out animate-pulse"
+        className="inline-block mt-4 px-8 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)] hover:bg-opacity-90 transition duration-300 ease-in-out animate-pulse"
       >
         Explore Our Menu
       </HashLink>
