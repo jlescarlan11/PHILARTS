@@ -1,4 +1,3 @@
-// File: FormField.tsx
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
 import { FaCheck, FaExclamationCircle } from "react-icons/fa";
@@ -14,6 +13,7 @@ interface FormFieldProps {
   validation?: any;
   isTextArea?: boolean;
   rows?: number;
+  title?: string; // Added optional title prop for inline hints.
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -26,11 +26,10 @@ const FormField: React.FC<FormFieldProps> = ({
   validation,
   isTextArea = false,
   rows = 3,
+  title,
 }) => {
-  // Extract onBlur from the register return value (no onFocus here).
   const { onBlur: registerOnBlur, ...rest } = register(name, validation);
 
-  // Custom event handlers.
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -47,9 +46,10 @@ const FormField: React.FC<FormFieldProps> = ({
   const commonProps = {
     id: name,
     placeholder,
+    title, // Pass title to input for inline hint.
     className: `mt-1 block w-full p-2 border ${
       error ? "border-red-500" : "border-gray-300"
-    } rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition`,
+    } rounded focus:outline-none focus:ring-2 focus:ring-accent transition-colors duration-300`,
     "aria-invalid": !!error,
     "aria-describedby": `${name}-error`,
     onBlur: handleBlur,
@@ -58,8 +58,11 @@ const FormField: React.FC<FormFieldProps> = ({
   };
 
   return (
-    <div className="mb-6 relative transition-all duration-200 group">
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+    <div className="mb-6 relative transition-all duration-300 group">
+      <label
+        htmlFor={name}
+        className="block text-sm font-medium text-secondary"
+      >
         {label}
       </label>
       {isTextArea ? (
@@ -70,7 +73,7 @@ const FormField: React.FC<FormFieldProps> = ({
       {error ? (
         <div
           id={`${name}-error`}
-          className="absolute right-2 top-10 text-red-500 flex items-center transition-opacity duration-200"
+          className="absolute right-2 top-10 text-red-500 flex items-center transition-opacity duration-300"
           role="alert"
           aria-live="assertive"
         >
@@ -78,7 +81,7 @@ const FormField: React.FC<FormFieldProps> = ({
           <span>{error}</span>
         </div>
       ) : (
-        <FaCheck className="absolute right-2 top-10 text-green-500 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100" />
+        <FaCheck className="absolute right-2 top-10 text-green-500 opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
       )}
     </div>
   );

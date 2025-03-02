@@ -1,235 +1,173 @@
-import React, { useState, lazy, Suspense, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+  FaShieldAlt,
+} from "react-icons/fa";
+import { MdArrowUpward } from "react-icons/md";
 
-// Lazy load social icons for performance
-const FaFacebookF = lazy(() =>
-  import("react-icons/fa").then((module) => ({ default: module.FaFacebookF }))
+// -------------------------
+// BrandInfo Component
+// -------------------------
+const BrandInfo: React.FC = () => (
+  <div className="text-center md:text-left">
+    <h2 className="text-2xl font-bold text-secondary">Nutcha Bite</h2>
+    <p className="mt-2 text-sm text-secondary">
+      Contact us:&nbsp;
+      <a
+        href="mailto:info@nutchabite.com"
+        className="text-accent hover:underline focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
+      >
+        info@nutchabite.com
+      </a>
+      &nbsp;|&nbsp;+1 (555) 123-4567
+    </p>
+  </div>
 );
-const FaTwitter = lazy(() =>
-  import("react-icons/fa").then((module) => ({ default: module.FaTwitter }))
-);
-const FaInstagram = lazy(() =>
-  import("react-icons/fa").then((module) => ({ default: module.FaInstagram }))
-);
 
-const Footer: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  // Simple email regex validation
-  const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    if (value && !validateEmail(value)) {
-      setError("Please enter a valid email address.");
-    } else {
-      setError(null);
-    }
-  };
-
-  const handleSubscribe = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    // Simulate analytics tracking
-    console.log("Newsletter subscribe clicked", email);
-    // Simulate subscription success with a discount incentive
-    setSuccess(
-      "Thank you for subscribing! Enjoy a 10% discount on your next order."
-    );
-    setEmail("");
-  };
-
-  // Analytics tracking for social interactions
-  const handleSocialClick = (platform: string) => {
-    console.log(`Social icon clicked: ${platform}`);
-  };
+// -------------------------
+// SocialLinks Component
+// -------------------------
+const SocialLinks: React.FC = () => {
+  const icons = [
+    {
+      href: "https://facebook.com",
+      label: "Facebook",
+      icon: <FaFacebookF size={20} />,
+    },
+    {
+      href: "https://twitter.com",
+      label: "Twitter",
+      icon: <FaTwitter size={20} />,
+    },
+    {
+      href: "https://instagram.com",
+      label: "Instagram",
+      icon: <FaInstagram size={20} />,
+    },
+    {
+      href: "https://linkedin.com",
+      label: "LinkedIn",
+      icon: <FaLinkedinIn size={20} />,
+    },
+  ];
 
   return (
-    <footer className="bg-gray-50 py-8">
-      <div className="container mx-auto px-4 grid gap-8 md:grid-cols-4">
-        {/* Brand Story & Contact */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-bold text-secondary">Nutcha Bite</h3>
-          <p className="text-sm text-gray-600">
-            At Nutcha Bite, we blend passion with flavor. Our mission is to
-            serve fresh, innovative, and delectable cuisine that nourishes both
-            body and soul.
+    <div className="flex items-center space-x-6 justify-center">
+      {icons.map(({ href, label, icon }) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          className="text-accent transition-transform duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-accent"
+        >
+          {icon}
+        </a>
+      ))}
+    </div>
+  );
+};
+
+// -------------------------
+// NewsletterSignup Component
+// -------------------------
+const NewsletterSignup: React.FC = () => (
+  <div className="mt-6 md:mt-0 flex flex-col items-center">
+    <h3 className="text-lg font-semibold text-secondary">Stay Updated!</h3>
+    <form className="flex mt-2" aria-label="Newsletter Signup Form">
+      <input
+        type="email"
+        placeholder="Your email"
+        className="px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-accent transition-colors duration-300"
+        aria-label="Email address"
+      />
+      <button
+        type="submit"
+        className="bg-accent text-[var(--color-primary)] bg-[var(--color-accent)] px-4 py-2 rounded-r-md hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-accent transition-colors duration-300"
+      >
+        Subscribe
+      </button>
+    </form>
+  </div>
+);
+
+// -------------------------
+// TrustSignals Component
+// -------------------------
+const TrustSignals: React.FC = () => (
+  <div className="mt-6 flex flex-col items-center justify-center">
+    <div className="flex items-center space-x-2 justify-center">
+      <FaShieldAlt className="text-accent" size={20} aria-hidden="true" />
+      <span className="text-xs text-secondary">
+        Secure transactions &amp; trusted by thousands
+      </span>
+    </div>
+  </div>
+);
+
+// -------------------------
+// BackToTop Component (Dynamic)
+// -------------------------
+const BackToTop: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.pageYOffset > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  return (
+    <>
+      {isVisible && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-accent text-[var(--color-primary)] bg-[var(--color-accent)] px-2 py-2 rounded-full shadow-lg hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-300"
+          aria-label="Back to top"
+        >
+          <MdArrowUpward />
+        </button>
+      )}
+    </>
+  );
+};
+
+// -------------------------
+// Main Footer Component
+// -------------------------
+const Footer: React.FC = () => {
+  const currentYear = new Date().getFullYear();
+  return (
+    <footer className="bg-gray-100 py-8">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col space-y-6 md:space-y-0 md:flex-row md:justify-between md:items-center">
+        <BrandInfo />
+        <SocialLinks />
+        <NewsletterSignup />
+      </div>
+
+      <TrustSignals />
+
+      <div className="mt-8 border-t border-gray-300 pt-4">
+        <div className="max-w-7xl mx-auto px-4 flex  justify-center space-y-4 ">
+          <p className="text-xs text-secondary">
+            &copy; {currentYear} John Lester Escarlan | All rights reserved
           </p>
-          <address className="not-italic text-sm text-gray-600">
-            1234 Culinary St.
-            <br />
-            Flavor Town, USA
-            <br />
-            <a
-              href="mailto:contact@nutchabite.com"
-              className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-            >
-              contact@nutchabite.com
-            </a>
-          </address>
-        </div>
-
-        {/* Navigation Links */}
-        <nav aria-label="Footer Navigation" className="space-y-2">
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="#home"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                Home
-              </a>
-            </li>
-            <li>
-              <a
-                href="#menu"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                Menu
-              </a>
-            </li>
-            <li>
-              <a
-                href="#about"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                About
-              </a>
-            </li>
-            <li>
-              <a
-                href="#contact"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                Contact
-              </a>
-            </li>
-            <li>
-              <a
-                href="#privacy"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                Privacy Policy
-              </a>
-            </li>
-            <li>
-              <a
-                href="#faq"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                FAQ
-              </a>
-            </li>
-            <li>
-              <a
-                href="#careers"
-                className="text-accent hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                Careers
-              </a>
-            </li>
-          </ul>
-        </nav>
-
-        {/* Newsletter Subscription Form */}
-        <div className="space-y-4">
-          <h4 className="text-lg font-semibold text-secondary">
-            Join Our Newsletter
-          </h4>
-          <p className="text-sm text-gray-600">
-            Subscribe now and get a 10% discount on your next order, plus
-            exclusive updates and offers.
-          </p>
-          <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
-            <label htmlFor="newsletter-email" className="sr-only">
-              Email address
-            </label>
-            <input
-              type="email"
-              id="newsletter-email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={handleEmailChange}
-              required
-              className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-accent"
-              aria-label="Email address for newsletter subscription"
-            />
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-            {success && <p className="text-green-500 text-xs">{success}</p>}
-            <button
-              type="submit"
-              data-cta="subscribeA"
-              className="px-4 py-2 bg-accent text-white rounded hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
-            >
-              Get Started & Save 10%
-            </button>
-          </form>
-        </div>
-
-        {/* Social Media & Trust Signals */}
-        <div className="space-y-4">
-          <h4 className="text-lg font-semibold text-secondary">
-            Connect with Us
-          </h4>
-          <div className="flex space-x-4">
-            <Suspense fallback={<div>Loading...</div>}>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                onClick={() => handleSocialClick("Facebook")}
-                className="text-accent hover:text-accent/80 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                <FaFacebookF size={20} />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter"
-                onClick={() => handleSocialClick("Twitter")}
-                className="text-accent hover:text-accent/80 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                <FaTwitter size={20} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                onClick={() => handleSocialClick("Instagram")}
-                className="text-accent hover:text-accent/80 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent"
-              >
-                <FaInstagram size={20} />
-              </a>
-            </Suspense>
-          </div>
-          {/* Trust Signals */}
-          <div className="mt-4">
-            <p className="text-sm text-gray-600">
-              "Best dining experience ever!" - A Happy Customer
-            </p>
-            <div className="mt-2">
-              <img
-                src="/trust-badge.png"
-                alt="Trust Badge"
-                className="w-24 h-auto"
-                loading="lazy"
-              />
-            </div>
-          </div>
         </div>
       </div>
-      {/* Bottom Footer */}
-      <div className="mt-8 border-t border-gray-200 pt-4 text-center text-xs text-gray-500">
-        &copy; {new Date().getFullYear()} Nutcha Bite. All rights reserved.
-      </div>
+
+      <BackToTop />
     </footer>
   );
 };

@@ -114,12 +114,12 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
         <button
           onClick={() => onToggle(index)}
           role="button"
-          className="w-full flex items-center justify-between py-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="w-full flex items-center gap-4 justify-between py-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           aria-expanded={isOpen}
           aria-controls={`faq-answer-${index}`}
           aria-label={`${item.question} toggle`}
         >
-          <span className="text-xl text-[var(--color-secondary)]">
+          <span className="text-xl flex text-justify text-[var(--color-secondary)]">
             {item.question}
           </span>
           <span
@@ -149,7 +149,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
       {/* FAQ Answer */}
       <dd
         id={`faq-answer-${index}`}
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+        className={`overflow-hidden text-justify transition-all duration-500 ease-in-out ${
           isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -203,6 +203,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
             </span>
           ) : (
             <>
+              <p>Was this helpful?</p>
               <button
                 onClick={() => {
                   setFeedbackSubmitted(true);
