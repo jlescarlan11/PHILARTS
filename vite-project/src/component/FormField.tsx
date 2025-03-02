@@ -39,7 +39,7 @@ const FormField: React.FC<FormFieldProps> = ({
   };
 
   const handleFocus = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+    _e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     trackEvent("FieldFocus", { field: name });
   };
