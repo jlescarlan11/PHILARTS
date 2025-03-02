@@ -182,12 +182,13 @@ const ContactForm: React.FC = () => {
             }}
             title="Write your message here"
           />
-          <div className="mb-6 flex flex-col items-center">
+          <div className="mb-6 flex flex-col">
             <div>
               <ReCAPTCHA
                 ref={recaptchaRef}
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY as string}
                 className="w-full scale-75 sm:scale-100"
+                style={{ transformOrigin: "0  0" }}
                 onChange={handleRecaptchaChange}
               />
             </div>
