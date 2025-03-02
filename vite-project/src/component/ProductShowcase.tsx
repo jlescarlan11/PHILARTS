@@ -698,7 +698,7 @@ const ProductShowcase: React.FC = () => {
         <CartConfirmationModal
           onViewCart={() => {
             setShowCartConfirmationModal(false);
-            navigate("/checkout");
+            navigate("/cart");
           }}
           onContinue={() => setShowCartConfirmationModal(false)}
           onUndo={handleUndoAddToCart}
