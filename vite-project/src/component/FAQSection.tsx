@@ -114,12 +114,12 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
         <button
           onClick={() => onToggle(index)}
           role="button"
-          className="w-full flex items-center gap-4 justify-between py-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="w-full flex items-center gap-2 sm:gap-4 justify-between py-2 sm:py-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] active:scale-95 transition-all duration-300 ease-in-out"
           aria-expanded={isOpen}
           aria-controls={`faq-answer-${index}`}
           aria-label={`${item.question} toggle`}
         >
-          <span className="text-xl flex text-justify text-[var(--color-secondary)]">
+          <span className="text-lg sm:text-xl flex text-start text-[var(--color-secondary)]">
             {item.question}
           </span>
           <span
@@ -131,7 +131,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5 sm:h-6 sm:w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -149,12 +149,12 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
       {/* FAQ Answer */}
       <dd
         id={`faq-answer-${index}`}
-        className={`overflow-hidden text-justify transition-all duration-500 ease-in-out ${
+        className={`overflow-hidden text-start transition-all duration-500 ease-in-out ${
           isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <p
-          className="py-2 pl-4 text-lg"
+          className="py-2 pl-2 sm:pl-4 text-base sm:text-lg"
           dangerouslySetInnerHTML={{
             __html: isLong && !readMore ? shortAnswer : fullAnswer,
           }}
@@ -165,7 +165,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
               toggle();
               trackEvent("read_more_clicked", { questionIndex: index });
             }}
-            className="ml-4 underline text-[var(--color-accent)] transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="ml-2 sm:ml-4 underline text-[var(--color-accent)] transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
             aria-label="Read more"
           >
             Read More
@@ -177,7 +177,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
               toggle();
               trackEvent("show_less_clicked", { questionIndex: index });
             }}
-            className="ml-4 underline text-[var(--color-accent)] transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="ml-2 sm:ml-4 underline text-[var(--color-accent)] transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
             aria-label="Show less"
           >
             Show Less
@@ -185,7 +185,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
         )}
         {/* Inline CTA for additional engagement */}
         {isLong && (
-          <p className="mt-2 pl-4 text-sm">
+          <p className="mt-2 pl-2 sm:pl-4 text-sm">
             <a
               href="/support/ingredients"
               className="underline text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
@@ -196,14 +196,14 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
           </p>
         )}
         {/* "Was this helpful?" feedback buttons */}
-        <div className="mt-2 pl-4 flex items-center space-x-4">
+        <div className="mt-2 pl-2 sm:pl-4 flex items-center space-x-2 sm:space-x-4">
           {feedbackSubmitted ? (
             <span className="text-sm text-[var(--color-accent)]">
               Thank you for your feedback!
             </span>
           ) : (
             <>
-              <p>Was this helpful?</p>
+              <p className="text-sm">Was this helpful?</p>
               <button
                 onClick={() => {
                   setFeedbackSubmitted(true);
@@ -212,7 +212,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
                     feedback: "like",
                   });
                 }}
-                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] active:scale-95"
                 aria-label="Mark as helpful"
               >
                 👍
@@ -225,7 +225,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
                     feedback: "dislike",
                   });
                 }}
-                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] active:scale-95"
                 aria-label="Mark as not helpful"
               >
                 👎
@@ -247,19 +247,19 @@ interface FAQSearchBoxProps {
   setQuery: (q: string) => void;
 }
 const FAQSearchBox: React.FC<FAQSearchBoxProps> = ({ query, setQuery }) => (
-  <div className="mb-8 flex items-center">
+  <div className="mb-6 sm:mb-8 flex items-center">
     <input
       type="text"
       value={query}
       onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
       placeholder="Search FAQs..."
-      className="flex-grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="flex-grow p-2 sm:p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-sm sm:text-base"
       aria-label="Search FAQs"
     />
     {query && (
       <button
         onClick={() => setQuery("")}
-        className="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+        className="ml-2 px-3 py-2 sm:px-4 sm:py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
         aria-label="Clear search"
       >
         Clear
@@ -303,7 +303,7 @@ const FAQSection: React.FC = () => {
   return (
     <section
       id="faq"
-      className="bg-[var(--color-primary)] text-[var(--color-secondary)] py-16"
+      className="bg-[var(--color-primary)] text-[var(--color-secondary)] py-8 sm:py-12 md:py-16"
       role="region"
       aria-label="Frequently Asked Questions"
     >
@@ -311,19 +311,19 @@ const FAQSection: React.FC = () => {
       <div aria-live="polite" className="sr-only">
         {announcement}
       </div>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Introductory paragraph explaining the FAQ organization */}
-        <p className="mb-4 text-center text-lg">
+        <p className="mb-4 text-center text-base sm:text-lg">
           Here you'll find answers to our most common questions. Use the search
           box to quickly locate topics, and click on a question to see the
           answer.
         </p>
-        <h2 className="text-4xl font-bold text-center mb-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">
           Frequently Asked Questions
         </h2>
         {/* Search/Filter Box */}
         <FAQSearchBox query={query} setQuery={setQuery} />
-        <dl className="space-y-4">
+        <dl className="space-y-2 sm:space-y-4">
           {filteredFAQs.map((item, index) => (
             <FAQItemComponent
               key={index}
@@ -335,15 +335,17 @@ const FAQSection: React.FC = () => {
             />
           ))}
           {filteredFAQs.length === 0 && (
-            <p className="text-center text-lg">No FAQs match your search.</p>
+            <p className="text-center text-base sm:text-lg">
+              No FAQs match your search.
+            </p>
           )}
         </dl>
         {/* Secondary CTA */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 sm:mt-12 text-center">
           <HashLink
             smooth
             to="#contact"
-            className="inline-block px-8 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
+            className="inline-block px-6 sm:px-8 py-2 sm:py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
             aria-label="Still have questions? Contact us!"
           >
             Still have questions? Contact us!
