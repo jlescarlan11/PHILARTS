@@ -112,9 +112,8 @@ const Navbar: React.FC = () => {
   const [activeLink, setActiveLink] = useState("#home"); // Active navigation link
   const [menuStatus, setMenuStatus] = useState("Mobile menu closed"); // ARIA live region status
   const [darkMode, setDarkMode] = useState(false); // Dark mode state
-  const [searchQuery, setSearchQuery] = useState(""); // Search query for filtering
+  const [] = useState(""); // Search query for filtering
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // ------------------------
   // Dark Mode Persistence
@@ -209,31 +208,10 @@ const Navbar: React.FC = () => {
   // ------------------------
   // Search Functionality
   // ------------------------
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    // Basic validation: add error style if search query is too short (optional)
-    if (e.target.value && e.target.value.length < 3) {
-      e.target.classList.add("border-red-500");
-    } else {
-      e.target.classList.remove("border-red-500");
-    }
-  };
 
   // Optionally, handle Enter key in search input to select first result
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (filteredResults.length === 1) {
-        handleNavItemClick(filteredResults[0].url);
-      }
-    }
-  };
 
   // Filter the content items based on search query (case-insensitive)
-  const filteredResults = searchQuery
-    ? contentItems.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
 
   const navigate = useNavigate();
   const { cartItems } = useCart();
