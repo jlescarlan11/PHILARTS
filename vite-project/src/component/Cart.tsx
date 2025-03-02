@@ -20,11 +20,6 @@ const initialFormData: FormData = {
   message: "",
 };
 
-// Basic sanitization function to escape HTML tags and avoid XSS vulnerabilities
-const sanitizeInput = (input: string) => {
-  return input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-};
-
 const ContactForm: React.FC = () => {
   // State declarations for form data, errors, submission status, and messages
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -32,7 +27,7 @@ const ContactForm: React.FC = () => {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [, setErrorMsg] = useState<string>("");
   // Honeypot field for spam prevention (hidden from real users)
   const [honeypot, setHoneypot] = useState<string>("");
   // Modal state for confirmation on successful submission
@@ -169,15 +164,6 @@ const ContactForm: React.FC = () => {
     if (!validate()) return;
 
     setStatus("submitting");
-
-    // Sanitize the form data before submission.
-    const sanitizedData: FormData = {
-      name: sanitizeInput(formData.name),
-      email: sanitizeInput(formData.email),
-      phone: sanitizeInput(formData.phone),
-      subject: sanitizeInput(formData.subject),
-      message: sanitizeInput(formData.message),
-    };
 
     // Simulate a backend submission with a delay.
     setTimeout(() => {
