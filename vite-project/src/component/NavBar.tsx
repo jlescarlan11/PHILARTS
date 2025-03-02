@@ -363,54 +363,6 @@ const Navbar: React.FC = () => {
 
           <div className=" md:hidden flex items-center gap-2">
             <div className="flex items-center gap-4">
-              {/* Dark Mode Toggle with Accessible State */}
-              {/* Dedicated Close Button for Mobile Menu */}
-
-              <button
-                onClick={toggleDarkMode}
-                title="Toggle dark mode"
-                aria-pressed={darkMode}
-                className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
-              >
-                {darkMode ? (
-                  <MdLightMode className="size-6" />
-                ) : (
-                  <MdDarkMode className="size-6" />
-                )}
-              </button>
-
-              <div className="relative mr-4">
-                <button
-                  title="Go to Cart"
-                  onClick={() => navigate("/cart")}
-                  className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
-                >
-                  <MdShoppingCart className="size-6" />
-                </button>
-                {(cartCount ?? 0) > 0 && (
-                  <span className="absolute top-0 right-0 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs rounded-full px-1">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <HashLink
-                smooth
-                to="\#products"
-                onClick={() => {
-                  handleNavItemClick("#menu");
-                  trackEvent("cta_click", {
-                    element: "Order Now",
-                    link: "#order",
-                  });
-                }}
-                title="Order Now"
-                className="bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-              >
-                Order Now
-              </HashLink>
-
               {/* Mobile Menu Toggle Button */}
               <button
                 onClick={toggleMenu}
@@ -468,47 +420,54 @@ const Navbar: React.FC = () => {
                 />
               ))}
 
-              {/* Integrated Search Bar with Actual Filtering */}
               <li>
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search..."
-                  aria-label="Search"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onKeyDown={handleSearchKeyDown}
-                  className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition placeholder-gray-500"
-                />
-                {searchQuery && (
-                  <ul
-                    role="listbox"
-                    className="mt-2 border border-gray-200 rounded bg-[var(--color-primary)] dark:bg-gray-800"
-                  >
-                    {filteredResults.length > 0 ? (
-                      filteredResults.map((result) => (
-                        <li
-                          key={result.id}
-                          role="option"
-                          onClick={() => {
-                            handleNavItemClick(result.url);
-                            trackEvent("search_result_click", {
-                              title: result.title,
-                              url: result.url,
-                            });
-                          }}
-                          className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                        >
-                          {result.title}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="px-3 py-2 text-gray-500">
-                        No results found
-                      </li>
-                    )}
-                  </ul>
-                )}
+                <button
+                  onClick={toggleDarkMode}
+                  title="Toggle dark mode"
+                  aria-pressed={darkMode}
+                  className="flex items-center gap-2  w-full border border-[var(--color-accent)] text-[var(--color-secondary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
+                >
+                  {darkMode ? (
+                    <>
+                      <MdLightMode className="size-6" />
+                      Toggle Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <MdDarkMode className="size-6" />
+                      Toggle Light Mode
+                    </>
+                  )}
+                </button>
+              </li>
+
+              <li>
+                <button
+                  title="Go to Cart"
+                  onClick={() => navigate("/cart")}
+                  className="w-full bg-[var(--color-accent)] flex items-center gap-2 text-[var(--color-primary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
+                >
+                  <MdShoppingCart className="size-6" />
+                  Shopping Cart
+                </button>
+              </li>
+
+              <li>
+                <HashLink
+                  smooth
+                  to="\#products"
+                  onClick={() => {
+                    handleNavItemClick("#menu");
+                    trackEvent("cta_click", {
+                      element: "Order Now",
+                      link: "#order",
+                    });
+                  }}
+                  title="Order Now"
+                  className="block bg-[var(--color-accent)] text-[var(--color-primary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
+                >
+                  Order Now
+                </HashLink>
               </li>
             </ul>
           </nav>
