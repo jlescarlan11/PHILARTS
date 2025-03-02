@@ -11,7 +11,7 @@ class ErrorBoundary extends React.Component<any, { hasError: boolean }> {
     super(props);
     this.state = { hasError: false };
   }
-  static getDerivedStateFromError(error: any) {
+  static getDerivedStateFromError() {
     // Update state so the next render shows the fallback UI.
     return { hasError: true };
   }
@@ -54,9 +54,6 @@ const initialFormData: FormData = {
 };
 
 // Basic sanitization function to escape HTML tags (avoids XSS)
-const sanitizeInput = (input: string) => {
-  return input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-};
 
 const ContactForm: React.FC = () => {
   // ---------------------------------------------------------
@@ -67,7 +64,7 @@ const ContactForm: React.FC = () => {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [, setErrorMsg] = useState<string>("");
   const [honeypot, setHoneypot] = useState<string>(""); // Hidden spam prevention field
   const [captchaChecked, setCaptchaChecked] = useState<boolean>(false); // Simple CAPTCHA checkbox
   const [previewModalVisible, setPreviewModalVisible] =
@@ -247,13 +244,6 @@ const ContactForm: React.FC = () => {
     setStatus("submitting");
 
     // Sanitize form data before submission.
-    const sanitizedData: FormData = {
-      name: sanitizeInput(formData.name),
-      email: sanitizeInput(formData.email),
-      phone: sanitizeInput(formData.phone),
-      subject: sanitizeInput(formData.subject),
-      message: sanitizeInput(formData.message),
-    };
 
     // Simulate backend submission with a progress indicator.
     setTimeout(() => {

@@ -4,43 +4,6 @@ import { useNavigate } from "react-router-dom";
 import autoTable from "jspdf-autotable";
 
 // -------------------------
-// Type Definitions for Order Details
-// -------------------------
-interface OrderItem {
-  id: string;
-  name: string;
-  size?: string;
-  quantity: number;
-  price: number;
-}
-
-interface OrderDetails {
-  orderNumber: number;
-  items: OrderItem[];
-  billing: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  shipping: {
-    fullName: string;
-    address: string;
-    city: string;
-    postalCode: string;
-  };
-  pricing: {
-    subtotal: number;
-    tax: number;
-    shippingCost: number;
-    discount: number;
-    discountAmount: number;
-    total: number;
-  };
-  estimatedDelivery: string;
-}
-
-// -------------------------
 // TrackingModal Component
 // Displays dynamic tracking details and now accepts a trackingNumber prop.
 // -------------------------
@@ -171,9 +134,6 @@ const OrderConfirmation: React.FC = () => {
   };
 
   // Handler for printing receipt.
-  const handlePrintReceipt = () => {
-    window.print();
-  };
 
   // Define types for order details (assumed to be imported or declared elsewhere)
   interface OrderItem {
