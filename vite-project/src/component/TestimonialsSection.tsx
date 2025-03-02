@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
-import { HashLink } from "react-router-hash-link";
+import {
+  MdArrowBackIos,
+  MdArrowForwardIos,
+  MdOutlinePause,
+  MdOutlineRateReview,
+  MdPlayArrow,
+  MdShare,
+} from "react-icons/md";
 
 /* -------------------------------------------------------
    Type Definitions
@@ -153,7 +160,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
   testimonial,
   onReadMore,
 }) => (
-  <div className="w-full flex-shrink-0 flex flex-col items-center p-8">
+  <div className="w-full  flex-shrink-0 flex flex-col items-center p-8">
     <picture>
       <source
         media="(max-width: 640px)"
@@ -182,7 +189,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
           className={`h-6 w-6 ${
             i < testimonial.rating
               ? "text-[var(--color-accent)]"
-              : "text-gray-300"
+              : "text-[var(--color-accent-20)]"
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -200,15 +207,17 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     <p className="text-center text-lg font-semibold text-[var(--color-accent)]">
       {testimonial.name}
       {testimonial.verified && (
-        <span className="ml-2 px-2 py-1 text-xs font-medium text-white bg-green-500 rounded-full">
+        <span className="ml-2 px-2 py-1 text-xs font-medium text-[var(--color-primary)] bg-[var(--color-tertiary)] rounded-full">
           Verified Buyer
         </span>
       )}
       {testimonial.title && (
-        <span className="block text-sm text-gray-600">{testimonial.title}</span>
+        <span className="block text-xs text-[var(--color-secondary-60)]">
+          {testimonial.title}
+        </span>
       )}
       {testimonial.location && (
-        <span className="block text-sm text-gray-600">
+        <span className="block text-xs text-[var(--color-secondary-60)]">
           {testimonial.location}
         </span>
       )}
@@ -254,42 +263,16 @@ const SliderControls: React.FC<SliderControlsProps> = ({
     <button
       onClick={onPrev}
       aria-label="Previous Testimonial"
-      className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white text-[var(--color-secondary)] rounded-full p-2 shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] pulse"
+      className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full p-2 shadow hover:bg-[var(--color-accent-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] pulse"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 19l-7-7 7-7"
-        />
-      </svg>
+      <MdArrowBackIos />
     </button>
     <button
       onClick={onNext}
       aria-label="Next Testimonial"
-      className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white text-[var(--color-secondary)] rounded-full p-2 shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] pulse"
+      className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full p-2 shadow hover:bg-[var(--color-accent-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] pulse"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5l7 7-7 7"
-        />
-      </svg>
+      <MdArrowForwardIos className="mx-auto" />
     </button>
     {/* Indicator Dots */}
     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -298,7 +281,9 @@ const SliderControls: React.FC<SliderControlsProps> = ({
           key={i}
           onClick={() => onSelect(i)}
           className={`w-3 h-3 rounded-full focus:outline-none ${
-            i === current ? "bg-[var(--color-accent)]" : "bg-gray-300"
+            i === current
+              ? "bg-[var(--color-accent)]"
+              : "bg-[var(--color-accent-20)]"
           }`}
           aria-label={`Go to testimonial ${i + 1}`}
         ></button>
@@ -308,30 +293,12 @@ const SliderControls: React.FC<SliderControlsProps> = ({
     <button
       onClick={onTogglePause}
       aria-label={paused ? "Play slideshow" : "Pause slideshow"}
-      className="absolute top-4 right-4 bg-white text-[var(--color-secondary)] rounded-full p-2 shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] pulse"
+      className="absolute top-4 right-4 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full p-2 shadow hover:bg-[var(--color-accent-90)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] pulse"
     >
-      {paused ? (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      ) : (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
-        </svg>
-      )}
+      {paused ? <MdPlayArrow /> : <MdOutlinePause />}
     </button>
     {/* Progress Bar */}
-    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
+    <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--color-accent-20)]">
       <div
         className="h-1 bg-[var(--color-accent)] transition-all duration-100"
         style={{ width: `${progress}%` }}
@@ -356,18 +323,18 @@ const Modal: React.FC<ModalProps> = ({ title, message, onClose }) => (
     aria-modal="true"
   >
     <div
-      className="absolute inset-0 bg-black opacity-50"
+      className="absolute inset-0 bg-[var(--color-secondary)] opacity-50"
       onClick={onClose}
       aria-hidden="true"
     ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10">
+    <div className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-md w-full z-10">
       <h3 className="text-2xl font-bold text-[var(--color-secondary)]">
         {title}
       </h3>
       <p className="mt-2 text-[var(--color-secondary)]">{message}</p>
       <button
         onClick={onClose}
-        className="mt-4 px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] ripple"
+        className="mt-4 px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] ripple"
         aria-label="Close"
       >
         Close
@@ -407,11 +374,11 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-black opacity-50"
+        className="absolute inset-0 bg-[var(--color-secondary)] opacity-50"
         onClick={onClose}
         aria-hidden="true"
       ></div>
-      <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10">
+      <div className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-md w-full z-10">
         <h3 className="text-2xl font-bold text-[var(--color-secondary)] mb-4">
           Submit Your Review
         </h3>
@@ -429,7 +396,9 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
               >
                 <svg
                   className={`h-6 w-6 transition-colors duration-200 ${
-                    i < rating ? "text-[var(--color-accent)]" : "text-gray-300"
+                    i < rating
+                      ? "text-[var(--color-accent)]"
+                      : "text-[var(--color-accent-50)]"
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -444,7 +413,7 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
         <textarea
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}
-          className="w-full h-32 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="w-full h-32 p-2 border border-[var(--color-accent-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           placeholder="Write your review here..."
           aria-label="Review Text"
         ></textarea>
@@ -453,7 +422,7 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
             type="text"
             value={reviewerName}
             onChange={(e) => setReviewerName(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full p-2 border border-[var(--color-accent-50)] text-[var(--color-secondary)] rounded mb-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             placeholder="Your Name"
             aria-label="Your Name"
           />
@@ -461,7 +430,7 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
             type="text"
             value={occupation}
             onChange={(e) => setOccupation(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full p-2 border border-[var(--color-accent-50)] text-[var(--color-secondary)] rounded mb-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             placeholder="Your Occupation"
             aria-label="Your Occupation"
           />
@@ -469,7 +438,7 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full p-2 border border-[var(--color-accent-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             placeholder="Your Address (e.g., Iloilo, Philippines)"
             aria-label="Your Address"
           />
@@ -477,7 +446,7 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
         <div className="mt-4 flex justify-end space-x-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="px-4 py-2 bg-[var(--color-accent-50)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent-70)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
             aria-label="Cancel review submission"
           >
             Cancel
@@ -486,7 +455,7 @@ const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
             onClick={() =>
               onSubmit(reviewText, rating, reviewerName, occupation, address)
             }
-            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] ripple"
+            className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-[var(--color-accent-90)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] ripple"
             aria-label="Submit your review"
           >
             Submit
@@ -508,7 +477,6 @@ const TestimonialsSection: React.FC = () => {
     paused,
     setPaused,
     progress,
-    handleKeyDown,
     goToSlide,
     nextSlide,
     prevSlide,
@@ -553,16 +521,24 @@ const TestimonialsSection: React.FC = () => {
   };
 
   // Handler for social share: opens modal confirmation.
-  const handleShareClick = (platform: string) => {
+  const handleShareClick = (platform: string | null | undefined) => {
+    if (platform === null || platform === undefined) {
+      console.error("handleShareClick: platform is null or undefined");
+      return;
+    }
     setSharePlatform(platform);
     setShareModalOpen(true);
-    trackEvent("share_click", { platform });
+    try {
+      trackEvent("share_click", { platform });
+    } catch (error) {
+      console.error("handleShareClick: Error tracking event:", error);
+    }
   };
 
   return (
     <section
       id="testimonials"
-      className="py-16 bg-white"
+      className="py-16 bg-[var(--color-primary)]"
       role="region"
       aria-label="Customer Testimonials"
       tabIndex={0}
@@ -611,24 +587,17 @@ const TestimonialsSection: React.FC = () => {
         <div className="mt-12 text-center">
           <button
             onClick={() => setReviewFormOpen(true)}
-            className="px-8 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
+            className="p-3 bg-[var(--color-accent)] text-[var(--color-primary)] hover:bg-[var(--color-accent-90)] rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
             aria-label="Submit Your Review"
           >
-            Submit Your Review
+            <MdOutlineRateReview />
           </button>
           <button
             onClick={() => handleShareClick("Facebook")}
-            className="ml-4 px-8 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
+            className="ml-4 p-3 bg-[var(--color-accent)] text-[var(--color-primary)] hover:bg-[var(--color-accent-90)] rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
             aria-label="Share on Facebook"
           >
-            Share on Facebook
-          </button>
-          <button
-            onClick={() => handleShareClick("Twitter")}
-            className="ml-4 px-8 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
-            aria-label="Share on Twitter"
-          >
-            Share on Twitter
+            <MdShare />
           </button>
         </div>
       </div>

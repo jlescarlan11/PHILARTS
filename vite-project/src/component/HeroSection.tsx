@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { HashLink } from "react-router-hash-link";
 import heroImage from "../assets/hero-image.webp";
-import Navbar from "./NavBar";
 
 /* --------------------------------------------
    Analytics Utility with Rich Metadata & Error Handling
@@ -54,7 +53,6 @@ interface LazyBackgroundImageProps {
   className?: string;
 }
 const LazyBackgroundImage: React.FC<LazyBackgroundImageProps> = ({
-  lowResSrc,
   highResSrc,
   className,
 }) => {

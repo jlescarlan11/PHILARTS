@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { HashLink } from "react-router-hash-link";
 
 /* -------------------------------------------------------

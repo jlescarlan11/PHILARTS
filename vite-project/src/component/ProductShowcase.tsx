@@ -1,15 +1,10 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  KeyboardEvent,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "../assets/hero-image.webp";
 import { useCart } from "../hooks/useCart";
 import { CartItem } from "../hooks/useCart";
+import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
+import { MdRemoveRedEye, MdShoppingCart } from "react-icons/md";
 
 // -------------------------
 // Type Definitions
@@ -258,13 +253,13 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({
       aria-describedby="add-to-cart-desc"
     >
       <div
-        className="absolute inset-0 bg-black opacity-50"
+        className="absolute inset-0 bg-[var(--color-secondary)] opacity-50"
         onClick={onClose}
         aria-hidden="true"
       ></div>
       <div
         ref={modalRef}
-        className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300"
+        className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300"
       >
         <h3
           id="add-to-cart-title"
@@ -292,11 +287,15 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({
                 size: e.target.value,
               });
             }}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full p-2 border border-[var(--color-secondary-30)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Select the ideal size for your product"
           >
             {product.sizes.map((option, idx) => (
-              <option key={idx} value={option.label}>
+              <option
+                key={idx}
+                value={option.label}
+                className="bg-[var(--color-primary)]"
+              >
                 {option.label}{" "}
                 {option.priceAdjustment > 0 &&
                   `(+$${option.priceAdjustment.toFixed(2)})`}
@@ -311,7 +310,7 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({
           <div className="flex">
             <button
               onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-              className="px-3 py-2 bg-gray-200 rounded-l hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
+              className="px-3 py-2 bg-[var(--color-accent)] rounded-l hover:bg-[var(--color-accent-90)] text-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] transition-transform duration-200"
               aria-label="Decrease the quantity"
             >
               –
@@ -320,13 +319,13 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-              className="w-16 text-center border-t border-b border-gray-200 focus:outline-none"
+              className="w-16 text-center border-t border-b border-[var(--color-accent-30)] text-[var(--color-secondary)] focus:outline-none"
               min="1"
               aria-label="Current quantity"
             />
             <button
               onClick={() => setQuantity((prev) => prev + 1)}
-              className="px-3 py-2 bg-gray-200 rounded-r hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
+              className="px-3 py-2 bg-[var(--color-accent)] rounded-r hover:bg-[var(--color-accent-90)] text-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] transition-transform duration-200"
               aria-label="Increase the quantity"
             >
               +
@@ -336,14 +335,14 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({
         <div className="flex justify-end space-x-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="px-4 py-2 bg-[var(--color-accent-50)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent-70)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
             aria-label="Cancel adding the product"
           >
             Cancel
           </button>
           <button
             onClick={() => onConfirm(selectedSize, quantity)}
-            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-[var(--color-accent-90)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] ripple"
             aria-label="Confirm your selection and add to cart"
           >
             Confirm
@@ -377,13 +376,13 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
       aria-describedby="view-product-desc"
     >
       <div
-        className="absolute inset-0 bg-black opacity-50"
+        className="absolute inset-0 bg-[var(--color-secondary)] opacity-50"
         onClick={onClose}
         aria-hidden="true"
       ></div>
       <div
         ref={modalRef}
-        className="relative bg-white p-6 rounded-lg max-w-3xl w-full z-10 transition-transform duration-300"
+        className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-3xl w-full z-10 transition-transform duration-300"
       >
         <h3
           id="view-product-title"
@@ -409,7 +408,7 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
             <p className="text-lg text-[var(--color-secondary)] mb-2">
               {product.description}
             </p>
-            <p className="text-xl font-semibold text-[var(--color-accent)] mb-2">
+            <p className="text-sm font-semibold text-[var(--color-accent)] mb-2">
               ${product.price.toFixed(2)}
             </p>
             {product.trustBadges && (
@@ -417,17 +416,17 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
                 {product.trustBadges.map((badge, idx) => (
                   <span
                     key={idx}
-                    className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded mr-2"
+                    className="inline-block bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs px-2 py-1 rounded mr-2"
                   >
                     {badge}
                   </span>
                 ))}
               </div>
             )}
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-[var(--color-secondary-60)]">
               Rating: {product.aggregateRating} / 5
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-[var(--color-secondary-60)]">
               Availability: {product.availability}
             </p>
           </div>
@@ -435,7 +434,7 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
         <div className="mt-4 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
             aria-label="Close the product details"
           >
             Close
@@ -466,7 +465,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isFavorite,
   cartCount,
 }) => {
-  const { src, handleError, error } = useResponsiveImage(product.image);
+  const { src, error } = useResponsiveImage(product.image);
 
   // Track product card view event.
   useEffect(() => {
@@ -482,7 +481,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       itemType="https://schema.org/Product"
     >
       {/* Transparent gradient overlay for readability */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/30 to-black/80"></div>
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[var(--color-tertiary-30)] to-[var(--color-primary-70)]"></div>
       {/* Display error message for screen readers if the image fails */}
       {error && (
         <div role="alert" aria-live="assertive" className="sr-only">
@@ -493,60 +492,28 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="absolute top-4 right-4 flex flex-col space-y-2">
         <button
           onClick={() => onViewProduct(product)}
-          className="p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          className="p-2 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label={`Discover more about ${product.name}`}
         >
           {/* Eye Icon */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-            />
-          </svg>
+          <MdRemoveRedEye className="text-[var(--color-primary)]" />
         </button>
         <button
           onClick={() => onAddToCart(product)}
-          className="relative p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          className="relative p-2 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label={`Add ${product.name} to your cart now`}
         >
           {/* Cart Icon */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.293 2.293a1 1 0 00.293 1.414l1.414 1.414a1 1 0 001.414 0L12 15m0 0l4 4m-4-4l-4 4"
-            />
-          </svg>
+          <MdShoppingCart className="text-[var(--color-primary)]" />
           {(cartCount ?? 0) > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+            <span className="absolute -top-1 -right-1 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs rounded-full px-1">
               {cartCount}
             </span>
           )}
         </button>
         <button
           onClick={() => onToggleFavorite(product)}
-          className="p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-hover)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          className="p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label={
             isFavorite
               ? `Remove ${product.name} from your favorites`
@@ -554,34 +521,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }
         >
           {isFavorite ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-red-500"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-            </svg>
+            <IoMdHeart className="text-red-500" />
           ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5.121 19.364l-1.414-1.414a8 8 0 1111.314 0l-1.414 1.414a6 6 0 10-8.486 0z"
-              />
-            </svg>
+            <IoMdHeartEmpty className="text-[var(--color-primary)]" />
           )}
         </button>
       </div>
       {/* Product details overlaid on the bottom */}
-      <div className="absolute bottom-4 left-4 right-4 text-white">
+      <div className="absolute bottom-4 left-4 right-4 text-[var(--color-primary)]">
         <h3 className="text-2xl font-bold">{product.name}</h3>
         <p className="text-sm">{product.description}</p>
         <p className="text-xs font-semibold mt-1">
@@ -592,7 +539,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {product.trustBadges.map((badge, idx) => (
               <span
                 key={idx}
-                className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded mr-2"
+                className="inline-block bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs px-2 py-1 rounded mr-2"
               >
                 {badge}
               </span>
@@ -603,15 +550,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     </div>
   );
 };
-
-// -------------------------
-// MiniCartBadge Component
-// Displays a real-time mini cart summary badge.
-const MiniCartBadge: React.FC<{ cartCount: number }> = ({ cartCount }) => (
-  <div className="absolute w-auto z-50 top-4 right-4 bg-[var(--color-accent)] text-white px-3 py-1 rounded-full shadow-lg">
-    {cartCount} Items
-  </div>
-);
 
 // -------------------------
 // Main Component: ProductShowcase
@@ -691,8 +629,6 @@ const ProductShowcase: React.FC = () => {
     trackEvent("toggle_favorite", { productId: product.id });
   };
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -726,7 +662,7 @@ const ProductShowcase: React.FC = () => {
 
   return (
     <section id="products" className="relative py-16 bg-[var(--color-primary)]">
-      <MiniCartBadge cartCount={cartCount} />
+      {/* <MiniCartBadge cartCount={cartCount} /> */}
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-8 text-[var(--color-secondary)]">
           Our Delicious Selections

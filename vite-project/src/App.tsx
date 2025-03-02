@@ -7,6 +7,8 @@ import AboutSection from "./component/AboutSection";
 import TestimonialsSection from "./component/TestimonialsSection";
 import FAQSection from "./component/FAQSection";
 import Cart from "./component/Cart";
+import SecureCheckout from "./component/SecureCheckout";
+import OrderConfirmation from "./component/OrderConfirmation";
 
 const App: React.FC = () => {
   return (
@@ -37,6 +39,9 @@ const App: React.FC = () => {
             }
           />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<SecureCheckout />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </main>
     </Router>

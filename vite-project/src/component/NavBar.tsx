@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HashLink } from "react-router-hash-link";
 import FocusLock from "react-focus-lock";
 import logo from "../assets/logo.svg";
-import { HiMoon, HiShoppingCart, HiSun } from "react-icons/hi";
+import { MdDarkMode, MdLightMode, MdShoppingCart } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../hooks/useCart";
 
 // ----------------------
 // Utility: Throttle Hook
@@ -233,6 +235,9 @@ const Navbar: React.FC = () => {
       )
     : [];
 
+  const navigate = useNavigate();
+  const { cartItems } = useCart();
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   return (
     <>
       {/* Skip to Content Link */}
@@ -269,18 +274,26 @@ const Navbar: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-[var(--nav-height)]">
           {/* Logo Section */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 ">
             <HashLink
               smooth
               to="/#hero"
               onClick={() => handleNavItemClick("/#hero")}
               title="Nutcha Bite Home"
+              className="flex items-center gap-2"
             >
               <img
                 src={logo}
                 alt="Nutcha Bite logo"
                 className="h-8 w-auto transition-transform duration-300 ease-in-out transform hover:scale-105"
               />
+              <h1 className="shrikhand-regular text-xl text-[var(--color-tertiary)]">
+                NUTCHA BITES
+              </h1>
+
+              {/* <h6 className="poppins-regular text-xs">
+                Old School Crunch, New School Vibes
+              </h6> */}
             </HashLink>
           </div>
 
@@ -300,75 +313,138 @@ const Navbar: React.FC = () => {
           </nav>
 
           {/* Desktop CTA Button */}
-          <div className="hidden md:flex items-center gap-4">
-            <button
-              onClick={toggleDarkMode}
-              title="Toggle dark mode"
-              aria-pressed={darkMode}
-              className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
-            >
-              {darkMode ? (
-                <HiSun className="size-6" />
-              ) : (
-                <HiMoon className="size-6" />
-              )}
-            </button>
-
-            <button>
-              <HiShoppingCart className="size-6" />
-            </button>
-
-            <HashLink
-              smooth
-              to="\#products"
-              onClick={() => {
-                handleNavItemClick("#order");
-                trackEvent("cta_click", {
-                  element: "Order Now",
-                  link: "#order",
-                });
-              }}
-              title="Order Now"
-              className="bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-            >
-              Order Now
-            </HashLink>
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggleDarkMode}
+                title="Toggle dark mode"
+                aria-pressed={darkMode}
+                className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
+              >
+                {darkMode ? (
+                  <MdLightMode className="size-6" />
+                ) : (
+                  <MdDarkMode className="size-6" />
+                )}
+              </button>
+              <div className="relative mr-4">
+                <button
+                  title="Go to Cart"
+                  onClick={() => navigate("/cart")}
+                  className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
+                >
+                  <MdShoppingCart className="size-6" />
+                </button>
+                {(cartCount ?? 0) > 0 && (
+                  <span className="absolute top-0 right-0 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs rounded-full px-1">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div>
+              <HashLink
+                smooth
+                to="\#products"
+                onClick={() => {
+                  handleNavItemClick("#order");
+                  trackEvent("cta_click", {
+                    element: "Order Now",
+                    link: "#order",
+                  });
+                }}
+                title="Order Now"
+                className="bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
+              >
+                Order Now
+              </HashLink>
+            </div>
           </div>
 
-          {/* Dark Mode Toggle with Accessible State */}
+          <div className=" md:hidden flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              {/* Dark Mode Toggle with Accessible State */}
+              {/* Dedicated Close Button for Mobile Menu */}
 
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={toggleMenu}
-            type="button"
-            aria-label="Toggle navigation menu"
-            aria-expanded={isOpen}
-            aria-controls="mobile-menu"
-            className="md:hidden text-[var(--color-secondary)] hover:text-[var(--color-accent)] focus:outline-none ml-4 ripple"
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              <button
+                onClick={toggleDarkMode}
+                title="Toggle dark mode"
+                aria-pressed={darkMode}
+                className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
+              >
+                {darkMode ? (
+                  <MdLightMode className="size-6" />
+                ) : (
+                  <MdDarkMode className="size-6" />
+                )}
+              </button>
+
+              <div className="relative mr-4">
+                <button
+                  title="Go to Cart"
+                  onClick={() => navigate("/cart")}
+                  className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
+                >
+                  <MdShoppingCart className="size-6" />
+                </button>
+                {(cartCount ?? 0) > 0 && (
+                  <span className="absolute top-0 right-0 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs rounded-full px-1">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <HashLink
+                smooth
+                to="\#products"
+                onClick={() => {
+                  handleNavItemClick("#menu");
+                  trackEvent("cta_click", {
+                    element: "Order Now",
+                    link: "#order",
+                  });
+                }}
+                title="Order Now"
+                className="bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
+              >
+                Order Now
+              </HashLink>
+
+              {/* Mobile Menu Toggle Button */}
+              <button
+                onClick={toggleMenu}
+                type="button"
+                aria-label="Toggle navigation menu"
+                aria-expanded={isOpen}
+                aria-controls="mobile-menu"
+                className="md:hidden text-[var(--color-secondary)] hover:text-[var(--color-accent)] focus:outline-none ripple"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  {isOpen ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Mobile Navigation Menu with Focus Lock */}
@@ -392,39 +468,6 @@ const Navbar: React.FC = () => {
                 />
               ))}
 
-              <li>
-                <HashLink
-                  smooth
-                  to="#order"
-                  onClick={() => {
-                    handleNavItemClick("#order");
-                    trackEvent("cta_click", {
-                      element: "Order Now",
-                      link: "#order",
-                    });
-                  }}
-                  title="Order Now"
-                  className="block bg-[var(--color-accent)] text-[var(--color-primary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-                >
-                  Order Now
-                </HashLink>
-              </li>
-              {/* Dedicated Close Button for Mobile Menu */}
-              <li>
-                <button
-                  onClick={toggleDarkMode}
-                  title="Toggle dark mode"
-                  aria-pressed={darkMode}
-                  className="w-full text-left flex items-center text-[var(--color-secondary)]  px-3 py-2 rounded border border-[var(--color-secondary)] hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors duration-300"
-                >
-                  {darkMode ? (
-                    <HiSun className="size-6" />
-                  ) : (
-                    <HiMoon className="size-6" />
-                  )}{" "}
-                  Toogle {darkMode ? "Dark" : "Light"} Mode
-                </button>
-              </li>
               {/* Integrated Search Bar with Actual Filtering */}
               <li>
                 <input

@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "jspdf": "^3.0.0",
+    "jspdf-autotable": "^5.0.2",
     "react-focus-lock": "^2.13.6",
     "react-router-hash-link": "^2.4.3",
     "react-slick": "^0.30.3",
