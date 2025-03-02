@@ -3,8 +3,13 @@
     "jspdf": "^3.0.0",
     "jspdf-autotable": "^5.0.2",
     "react-focus-lock": "^2.13.6",
+    "react-imask": "^7.6.1",
+    "react-input-mask": "^2.0.4",
     "react-router-hash-link": "^2.4.3",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1"
+  },
+  "devDependencies": {
+    "@types/react-input-mask": "^3.0.6"
   }
 }

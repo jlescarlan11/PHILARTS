@@ -1,562 +1,465 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { CartItem, useCart } from "../hooks/useCart";
+import React, { useState, useEffect, FormEvent, useRef } from "react";
+import InputMask from "react-input-mask"; // For phone input masking
+import { jsPDF } from "jspdf"; // For PDF generation
 
-// -------------------------
-// Analytics Tracker Utility
-// Define trackEvent so it is available in our component.
-const trackEvent = (eventName: string, details: Record<string, any>) => {
-  try {
-    if (window.gtag) {
-      window.gtag("event", eventName, details);
-    } else {
-      console.log(`Event: ${eventName}`, details);
-    }
-  } catch (error) {
-    console.error("Analytics tracking error:", error, eventName, details);
-  }
-};
-
-// -------------------------
-// Helper: groupCartItems
-// Groups duplicate cart items (by name, price, and size) by summing their quantities.
-const groupCartItems = (items: CartItem[]): CartItem[] => {
-  const grouped: Record<string, CartItem> = {};
-  items.forEach((item) => {
-    // Include size in key if available.
-    const key = `${item.name}-${item.price}-${item.size || "default"}`;
-    if (grouped[key]) {
-      grouped[key].quantity += item.quantity;
-    } else {
-      grouped[key] = { ...item };
-    }
-  });
-  return Object.values(grouped);
-};
-
-// -------------------------
-// Toast Component
-// Displays temporary toast notifications.
-const Toast: React.FC<{ message: string }> = ({ message }) => (
-  <div className="fixed bottom-4 right-4 bg-[var(--color-accent)] text-white px-4 py-2 rounded shadow-md animate-fadeIn">
-    {message}
-  </div>
-);
-
-// -------------------------
-// ConfirmModal Component
-// Custom modal to confirm cart clearance. ARIA attributes added.
-interface ConfirmModalProps {
+// Interface for form data
+interface FormData {
   name: string;
+  email: string;
+  phone: string; // Added phone field
+  subject: string;
   message: string;
-  onConfirm: () => void;
-  onCancel: () => void;
 }
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  name,
-  message,
-  onConfirm,
-  onCancel,
-}) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="confirm-modal-title"
-    aria-describedby="confirm-modal-description"
-  >
-    <div
-      className="absolute inset-0 bg-black opacity-50"
-      onClick={onCancel}
-      aria-hidden="true"
-    ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
-      <h3
-        id="confirm-modal-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
-      >
-        {name}
-      </h3>
-      <p
-        id="confirm-modal-description"
-        className="mt-2 text-[var(--color-secondary)]"
-      >
-        {message}
-      </p>
-      <div className="mt-4 flex justify-end space-x-2">
-        <button
-          onClick={onCancel}
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
-          aria-label="Cancel"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400"
-          aria-label="Confirm clear cart"
-        >
-          Clear Cart
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
-// -------------------------
-// ViewProductModal Component (Optional)
-// Displays detailed product info (including size) in a modal.
-const ViewProductModal: React.FC<{ item: CartItem; onClose: () => void }> = ({
-  item,
-  onClose,
-}) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="view-product-title"
-    aria-describedby="view-product-description"
-  >
-    <div
-      className="absolute inset-0 bg-black opacity-50"
-      onClick={onClose}
-      aria-hidden="true"
-    ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10">
-      <h3
-        id="view-product-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
-      >
-        {item.name}
-      </h3>
-      <img
-        src={item.image}
-        alt={item.name}
-        className="w-full h-48 object-cover rounded my-4"
-        loading="lazy"
-      />
-      <p
-        id="view-product-description"
-        className="text-[var(--color-secondary)]"
-      >
-        Price: ${item.price.toFixed(2)} | Quantity: {item.quantity}{" "}
-        {item.size && `| Size: ${item.size}`}
-      </p>
-      <button
-        onClick={onClose}
-        className="mt-4 px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
-        aria-label="Close product details"
-      >
-        Close
-      </button>
-    </div>
-  </div>
-);
+// Initial form data values
+const initialFormData: FormData = {
+  name: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+};
 
-// -------------------------
-// Cart Component
-// Displays cart items as modern cards with background images and gradient overlays,
-// and a sticky checkout summary with conversion-focused CTAs.
-const Cart: React.FC = () => {
-  const {
-    cartItems,
-    loading,
-    updateQuantity,
-    removeItem,
-    clearCart,
-    saveForLater,
-    applyCoupon,
-    getSubtotal,
-  } = useCart();
-  const [toast, setToast] = useState<string>("");
-  const [ariaAnnouncement, setAriaAnnouncement] = useState<string>("");
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [couponCode, setCouponCode] = useState("");
-  const [discount, setDiscount] = useState(0);
-  const [viewProduct, setViewProduct] = useState<CartItem | null>(null);
-  const [favorites, setFavorites] = useState<string[]>(() => {
-    return localStorage.getItem("favorites")
-      ? JSON.parse(localStorage.getItem("favorites")!)
-      : [];
-  });
-  const navigate = useNavigate();
+// Basic sanitization function to escape HTML tags and avoid XSS vulnerabilities
+const sanitizeInput = (input: string) => {
+  return input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
 
-  // Group duplicate items to ensure proper display.
-  const groupedItems = groupCartItems(cartItems);
+const ContactForm: React.FC = () => {
+  // State declarations for form data, errors, submission status, and messages
+  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [errorMsg, setErrorMsg] = useState<string>("");
+  // Honeypot field for spam prevention (hidden from real users)
+  const [honeypot, setHoneypot] = useState<string>("");
+  // Modal state for confirmation on successful submission
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  // Update favorite state in localStorage.
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const updated = prev.includes(id)
-        ? prev.filter((fid) => fid !== id)
-        : [...prev, id];
-      localStorage.setItem("favorites", JSON.stringify(updated));
-      return updated;
-    });
+  // Reference for error summary to set focus after validation errors
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
+
+  // ---------------------------
+  // Autosave functionality: load saved data from localStorage on mount.
+  useEffect(() => {
+    const savedData = localStorage.getItem("contactFormData");
+    if (savedData) {
+      setFormData(JSON.parse(savedData));
+    }
+  }, []);
+
+  // Save form data to localStorage whenever it changes.
+  useEffect(() => {
+    localStorage.setItem("contactFormData", JSON.stringify(formData));
+  }, [formData]);
+
+  // ---------------------------
+  // Enhanced validation function with length constraints and format checks.
+  const validate = (): boolean => {
+    const newErrors: Partial<FormData> = {};
+
+    // Validate Name: required, between 2 and 50 characters.
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (
+      formData.name.trim().length < 2 ||
+      formData.name.trim().length > 50
+    ) {
+      newErrors.name = "Name must be between 2 and 50 characters";
+    }
+
+    // Validate Email: required and must be in valid email format.
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)
+    ) {
+      newErrors.email = "Invalid email address";
+    }
+
+    // Validate Phone: optional but if provided must be 10 digits (US format).
+    if (formData.phone.trim()) {
+      // Remove non-digit characters and check length.
+      const digits = formData.phone.replace(/\D/g, "");
+      if (digits.length !== 10) {
+        newErrors.phone = "Phone number must be 10 digits";
+      }
+    }
+
+    // Validate Subject: required, between 5 and 100 characters.
+    if (!formData.subject.trim()) {
+      newErrors.subject = "Subject is required";
+    } else if (formData.subject.trim().length < 5) {
+      newErrors.subject = "Subject must be at least 5 characters";
+    } else if (formData.subject.trim().length > 100) {
+      newErrors.subject = "Subject must be less than 100 characters";
+    }
+
+    // Validate Message: required, between 10 and 500 characters.
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Message must be at least 10 characters";
+    } else if (formData.message.trim().length > 500) {
+      newErrors.message = "Message must be less than 500 characters";
+    }
+
+    setErrors(newErrors);
+
+    // If there are errors, focus on the error summary for accessibility.
+    if (Object.keys(newErrors).length > 0) {
+      if (errorSummaryRef.current) {
+        errorSummaryRef.current.focus();
+      } else {
+        // Fallback: focus the first invalid field.
+        const firstKey = Object.keys(newErrors)[0];
+        const element = document.querySelector(
+          `[name="${firstKey}"]`
+        ) as HTMLElement;
+        if (element) element.focus();
+      }
+    }
+
+    return Object.keys(newErrors).length === 0;
   };
 
-  // showToast helper: displays a toast and updates ARIA live region.
-  const showToast = (message: string) => {
-    setToast(message);
-    setAriaAnnouncement(message);
-    setTimeout(() => setToast(""), 3000);
-  };
-
-  // Handle quantity update.
-  const handleQuantityChange = (
-    id: string,
-    size: string,
-    delta: number,
-    itemName: string
+  // ---------------------------
+  // Handler for input changes, including for the honeypot field.
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const item = groupedItems.find((i) => i.id === id);
-    if (!item) return;
-    const newQuantity = item.quantity + delta;
-    if (newQuantity < 1) return;
-    updateQuantity(id, itemName, size, newQuantity);
-    showToast(`Quantity updated for ${itemName}`);
-    trackEvent("quantity_updated", { itemName, newQuantity });
+    if (e.target.name === "website") {
+      // Honeypot field (hidden from users)
+      setHoneypot(e.target.value);
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
-  // Handle item removal.
-  const handleRemove = (id: string, itemName: string, size: string) => {
-    removeItem(id, itemName, size);
-    showToast(`Item removed from cart: ${itemName}`);
-    trackEvent("item_removed", { itemName });
+  // ---------------------------
+  // Function to generate a PDF of the form submission using jsPDF.
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Contact Form Submission", 10, 20);
+    doc.setFontSize(12);
+    doc.text(`Name: ${formData.name}`, 10, 40);
+    doc.text(`Email: ${formData.email}`, 10, 50);
+    if (formData.phone) {
+      doc.text(`Phone: ${formData.phone}`, 10, 60);
+    }
+    doc.text(`Subject: ${formData.subject}`, 10, 70);
+    doc.text("Message:", 10, 80);
+    // Split message text if too long.
+    const splitMessage = doc.splitTextToSize(formData.message, 180);
+    doc.text(splitMessage, 10, 90);
+    doc.save("submission.pdf");
   };
 
-  // Handle saving an item for later.
-  const handleSaveForLater = (id: string, itemName: string, size: string) => {
-    saveForLater(id, itemName, size);
-    showToast(`${itemName} saved for later`);
-    trackEvent("item_saved_for_later", { itemName });
+  // ---------------------------
+  // Form submission handler including sanitization and simulated backend call.
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    // If the honeypot field is filled, it's likely spam.
+    if (honeypot) {
+      return;
+    }
+    if (!validate()) return;
+
+    setStatus("submitting");
+
+    // Sanitize the form data before submission.
+    const sanitizedData: FormData = {
+      name: sanitizeInput(formData.name),
+      email: sanitizeInput(formData.email),
+      phone: sanitizeInput(formData.phone),
+      subject: sanitizeInput(formData.subject),
+      message: sanitizeInput(formData.message),
+    };
+
+    // Simulate a backend submission with a delay.
+    setTimeout(() => {
+      const success = Math.random() > 0.2; // 80% chance of success.
+      if (success) {
+        setStatus("success");
+        // Clear autosaved data on successful submission.
+        localStorage.removeItem("contactFormData");
+        // Reset form to its initial state.
+        setFormData(initialFormData);
+        // Show modal confirmation with a preview of entered data.
+        setModalVisible(true);
+      } else {
+        setStatus("error");
+        setErrorMsg("Submission failed. Please try again.");
+      }
+    }, 1500);
   };
 
-  // Handle coupon code application.
-  const handleApplyCoupon = () => {
-    const discountRate = applyCoupon(couponCode);
-    setDiscount(discountRate);
-    showToast(
-      discountRate > 0 ? "Coupon applied: 10% off" : "Invalid coupon code"
-    );
-    trackEvent("coupon_applied", { couponCode, discountRate });
+  // ---------------------------
+  // Function to print a receipt. Dedicated print CSS should be added externally.
+  const printReceipt = () => {
+    window.print();
   };
-
-  // Pricing calculations.
-  const subtotal = getSubtotal();
-  const tax = subtotal * 0.1;
-  const shipping = subtotal > 0 && subtotal < 50 ? 5 : 0;
-  const discountAmount = subtotal * discount;
-  const total = subtotal + tax + shipping - discountAmount;
-
-  // Navigation actions.
-  const handleCheckout = () => {
-    navigate("/checkout");
-  };
-  const handleContinueShopping = () => {
-    navigate("/menu");
-  };
-
-  if (loading) return <p className="text-center p-4">Loading cart...</p>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left Column: Cart Items */}
-      <div>
-        <h2 className="text-3xl font-bold mb-6">Your Cart</h2>
-        {groupedItems.length === 0 ? (
-          <>
-            <p>Your cart is empty.</p>
-            {/* Recommended for You (Optional) */}
-            <div className="mt-6 p-4 bg-gray-100 rounded">
-              <h3 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
-                Recommended for You
-              </h3>
-              <p className="text-sm">
-                Check out our latest Nutcha Bite offerings to add to your cart.
-              </p>
-            </div>
-          </>
-        ) : (
-          <ul className="grid grid-cols-1 gap-6">
-            {groupedItems.map((item) => (
-              <li
-                key={item.id}
-                className="relative rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
-                // Use product image as background with a gradient overlay.
-                style={{
-                  backgroundImage: `url(${item.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              >
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-white/70 to-black/80"></div>
-                {/* Overlaid product details */}
-
-                {/* Icon buttons overlay arranged vertically at top-left */}
-                <div className="absolute top-2 right-2 flex flex-col space-y-1 z-20">
-                  <button
-                    onClick={() => toggleFavorite(item.id)}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                    aria-label={
-                      favorites.includes(item.id)
-                        ? `Remove ${item.name} from favorites`
-                        : `Add ${item.name} to favorites`
-                    }
-                  >
-                    {favorites.includes(item.id) ? (
-                      // Filled heart icon.
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-red-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 015.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-                      </svg>
-                    ) : (
-                      // Outline heart icon.
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setViewProduct(item)}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                    aria-label={`View product details for ${item.name}`}
-                  >
-                    {/* Eye icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-[var(--color-accent)]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleRemove(item.id, item.name, item.size || "default")
-                    }
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-400"
-                    aria-label={`Remove ${item.name} from cart`}
-                  >
-                    {/* Trash can icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-red-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a1 1 0 011 1v2H9V4a1 1 0 011-1z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleSaveForLater(
-                        item.id,
-                        item.name,
-                        item.size || "default"
-                      )
-                    }
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    aria-label={`Save ${item.name} for later`}
-                  >
-                    {/* Bookmark icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-blue-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 5v14l7-7 7 7V5a2 2 0 00-2-2H7a2 2 0 00-2 2z"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                {/* Overlaid product details */}
-                <div className="relative z-10 pt-36 pb-4 px-4">
-                  <p className="text-lg font-bold text-white">{item.name}</p>
-                  {item.size && (
-                    <p className="text-sm text-white">Size: {item.size}</p>
-                  )}
-                  <p className="text-sm text-white">
-                    Unit Price: ${item.price.toFixed(2)}
-                  </p>
-                  <p className="text-sm text-white">
-                    Total: ${(item.price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
-                {/* Quantity Controls - Positioned at bottom center */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 z-20">
-                  <button
-                    onClick={() =>
-                      handleQuantityChange(
-                        item.id,
-                        item.size || "default",
-                        -1,
-                        item.name
-                      )
-                    }
-                    className="px-2 py-1 bg-gray-200 rounded-l hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
-                    aria-label={`Decrease quantity of ${item.name}`}
-                  >
-                    –
-                  </button>
-                  <span className="text-white font-semibold">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() =>
-                      handleQuantityChange(
-                        item.id,
-                        item.size || "default",
-                        1,
-                        item.name
-                      )
-                    }
-                    className="px-2 py-1 bg-gray-200 rounded-r hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
-                    aria-label={`Increase quantity of ${item.name}`}
-                  >
-                    +
-                  </button>
-                </div>
-              </li>
+    <div className="max-w-lg mx-auto p-6 bg-[var(--color-primary)] text-[var(--color-secondary)] shadow-md rounded">
+      <h2 className="text-2xl font-bold mb-4">Contact Nutcha Bite</h2>
+      {/* ARIA live region for error summary */}
+      {status === "error" && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          tabIndex={-1}
+          ref={errorSummaryRef}
+          className="mb-4 p-2 border border-red-500 rounded bg-red-100 text-red-700"
+        >
+          <p>Please fix the following errors:</p>
+          <ul className="list-disc list-inside">
+            {Object.values(errors).map((err, index) => (
+              <li key={index}>{err}</li>
             ))}
           </ul>
-        )}
-      </div>
-      {/* Right Column: Sticky Checkout Summary */}
-      <div className="lg:sticky lg:top-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-2xl font-bold mb-4">Order Summary</h3>
-          <p className="text-lg">Subtotal: ${subtotal.toFixed(2)}</p>
-          <p className="text-lg">Tax (10%): ${tax.toFixed(2)}</p>
-          <p className="text-lg">Shipping: ${shipping.toFixed(2)}</p>
-          {discount > 0 && (
-            <p className="text-lg text-green-600">
-              Discount: -${discountAmount.toFixed(2)}
+        </div>
+      )}
+      <form onSubmit={handleSubmit} noValidate>
+        {/* Hidden honeypot field for spam prevention */}
+        <input
+          type="text"
+          name="website"
+          value={honeypot}
+          onChange={handleChange}
+          className="hidden"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+
+        {/* Name Field with inline label and helper text */}
+        <div className="mb-4">
+          <label htmlFor="name" className="block mb-1 font-medium">
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            aria-invalid={!!errors.name}
+            className="w-full p-2 border rounded focus:outline-none focus:border-[var(--color-accent)]"
+            placeholder="Your full name"
+          />
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1" role="alert">
+              {errors.name}
             </p>
-          )}
-          <p className="text-2xl font-bold mt-4">Total: ${total.toFixed(2)}</p>
-          {/* Coupon Code Input */}
-          <div className="mt-4 flex items-center">
-            <input
-              type="text"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              placeholder="Coupon Code"
-              className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-              aria-label="Enter coupon code"
-            />
-            <button
-              onClick={handleApplyCoupon}
-              className="ml-2 px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
-              aria-label="Apply coupon"
-            >
-              Apply
-            </button>
-          </div>
-          {/* CTA Buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between">
-            <button
-              onClick={handleContinueShopping}
-              className="px-6 py-3 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] mb-4 sm:mb-0"
-              aria-label="Continue shopping"
-            >
-              Continue Shopping
-            </button>
-            <button
-              onClick={handleCheckout}
-              className="px-6 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
-              aria-label="Proceed to Secure Checkout"
-            >
-              Proceed to Secure Checkout
-            </button>
-          </div>
-          {/* Persuasive Banner */}
-          {subtotal > 0 && subtotal < 50 && (
-            <p className="mt-4 text-sm text-[var(--color-secondary)]">
-              Free shipping on orders over $50!
-            </p>
-          )}
-          {/* Clear Cart Button moved into Checkout Summary */}
-          {groupedItems.length > 0 && (
-            <button
-              onClick={() => setShowConfirmModal(true)}
-              className="mt-4 w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400"
-              aria-label="Clear cart"
-            >
-              Clear Cart
-            </button>
           )}
         </div>
-      </div>
-      {/* ARIA live region for cart updates */}
-      <div aria-live="polite" className="sr-only">
-        {ariaAnnouncement}
-      </div>
-      {/* Toast Notification */}
-      {toast && <Toast message={toast} />}
-      {/* Confirm Clear Cart Modal */}
-      {showConfirmModal && (
-        <ConfirmModal
-          name="Clear Cart"
-          message="Are you sure you want to clear your cart?"
-          onConfirm={() => {
-            clearCart();
-            setShowConfirmModal(false);
-            showToast("Cart cleared");
-          }}
-          onCancel={() => setShowConfirmModal(false)}
-        />
+
+        {/* Email Field with inline label and helper text */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block mb-1 font-medium">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            aria-invalid={!!errors.email}
+            className="w-full p-2 border rounded focus:outline-none focus:border-[var(--color-accent)]"
+            placeholder="example@domain.com"
+          />
+          <p className="text-gray-500 text-xs mt-1">
+            Enter a valid email address
+          </p>
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1" role="alert">
+              {errors.email}
+            </p>
+          )}
+        </div>
+
+        {/* Phone Field with inline label, helper text, and input mask */}
+        <div className="mb-4">
+          <label htmlFor="phone" className="block mb-1 font-medium">
+            Phone (Optional)
+          </label>
+          <InputMask
+            mask="(999) 999-9999"
+            maskChar={null}
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          >
+            {(inputProps: any) => (
+              <input
+                {...inputProps}
+                type="text"
+                aria-invalid={!!errors.phone}
+                className="w-full p-2 border rounded focus:outline-none focus:border-[var(--color-accent)]"
+                placeholder="(123) 456-7890"
+              />
+            )}
+          </InputMask>
+          <p className="text-gray-500 text-xs mt-1">
+            Enter a 10-digit phone number
+          </p>
+          {errors.phone && (
+            <p className="text-red-500 text-sm mt-1" role="alert">
+              {errors.phone}
+            </p>
+          )}
+        </div>
+
+        {/* Subject Field with inline label and helper text */}
+        <div className="mb-4">
+          <label htmlFor="subject" className="block mb-1 font-medium">
+            Subject
+          </label>
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            aria-invalid={!!errors.subject}
+            className="w-full p-2 border rounded focus:outline-none focus:border-[var(--color-accent)]"
+            placeholder="Brief subject of your message"
+          />
+          <p className="text-gray-500 text-xs mt-1">
+            Between 5 and 100 characters
+          </p>
+          {errors.subject && (
+            <p className="text-red-500 text-sm mt-1" role="alert">
+              {errors.subject}
+            </p>
+          )}
+        </div>
+
+        {/* Message Field with inline label, helper text, and character counter */}
+        <div className="mb-4">
+          <label htmlFor="message" className="block mb-1 font-medium">
+            Message
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            aria-invalid={!!errors.message}
+            className="w-full p-2 border rounded focus:outline-none focus:border-[var(--color-accent)]"
+            placeholder="Type your message here..."
+            rows={4}
+          />
+          <div className="flex justify-between text-gray-500 text-xs mt-1">
+            <span>Between 10 and 500 characters</span>
+            <span>{formData.message.length} / 500</span>
+          </div>
+          {errors.message && (
+            <p className="text-red-500 text-sm mt-1" role="alert">
+              {errors.message}
+            </p>
+          )}
+        </div>
+
+        {/* Submit button with spinner indicator during submission */}
+        <button
+          type="submit"
+          disabled={status === "submitting"}
+          className="w-full flex items-center justify-center py-2 px-4 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition-colors"
+        >
+          {status === "submitting" && (
+            <svg
+              className="animate-spin h-5 w-5 mr-3 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              ></path>
+            </svg>
+          )}
+          {status === "submitting" ? "Sending..." : "Send Message"}
+        </button>
+      </form>
+
+      {/* Print & Download buttons for print receipt and PDF download (visible after successful submission) */}
+      {status === "success" && (
+        <div className="mt-4 flex justify-between">
+          <button
+            onClick={printReceipt}
+            className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Print Receipt
+          </button>
+          <button
+            onClick={downloadPDF}
+            className="py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            Download Confirmation
+          </button>
+        </div>
       )}
-      {/* View Product Modal */}
-      {viewProduct && (
-        <ViewProductModal
-          item={viewProduct}
-          onClose={() => setViewProduct(null)}
-        />
+
+      {/* Modal confirmation on successful submission showing a preview of entered data */}
+      {modalVisible && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+          {/* Modal content */}
+          <div className="relative bg-white p-6 rounded shadow-lg max-w-sm mx-auto text-center">
+            <h3 className="text-xl font-bold mb-4 text-[var(--color-secondary)]">
+              Thank You!
+            </h3>
+            <p className="mb-4 text-[var(--color-secondary)]">
+              Your message has been sent successfully.
+            </p>
+            {/* Preview of the entered data */}
+            <div className="text-left text-[var(--color-secondary)] text-sm">
+              <p>
+                <strong>Name:</strong> {formData.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {formData.email}
+              </p>
+              {formData.phone && (
+                <p>
+                  <strong>Phone:</strong> {formData.phone}
+                </p>
+              )}
+              <p>
+                <strong>Subject:</strong> {formData.subject}
+              </p>
+              <p>
+                <strong>Message:</strong> {formData.message}
+              </p>
+            </div>
+            <button
+              onClick={() => setModalVisible(false)}
+              className="mt-4 py-2 px-4 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
-export default Cart;
+export default ContactForm;
