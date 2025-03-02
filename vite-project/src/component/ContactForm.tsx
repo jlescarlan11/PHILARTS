@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,7 +9,7 @@ import ErrorSummary from "./ErrorSummary";
 import { useAutoSave } from "../hooks/useAutoSave";
 import { useExitIntent } from "../hooks/useExitIntent";
 import { trackEvent } from "../utils/analytics";
-import { FaLock } from "react-icons/fa";
+import { FaLock, FaSpinner } from "react-icons/fa";
 
 interface ContactFormValues {
   name: string;
@@ -80,8 +80,10 @@ const ContactForm: React.FC = () => {
   });
 
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: ContactFormValues) => {
+    setIsSubmitting(true);
     const sanitizedData: ContactFormValues = {
       name: sanitizeHtml(data.name),
       email: sanitizeHtml(data.email),
@@ -96,6 +98,7 @@ const ContactForm: React.FC = () => {
       toast.error(
         "Submission failed after multiple attempts. Please try again later."
       );
+      setIsSubmitting(false);
       return;
     }
     localStorage.removeItem("contactFormData");
@@ -103,6 +106,7 @@ const ContactForm: React.FC = () => {
     toast.success(
       "Thank you! Your message has been sent successfully. We'll get back to you soon."
     );
+    setIsSubmitting(false);
   };
 
   const onError = (errors: any) => {
@@ -117,16 +121,21 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="bg-primary py-12 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8 transition-all duration-300">
+    <section
+      id="contact"
+      className="bg-[var(--color-primary)] py-12 px-4 sm:px-6 md:px-8 transition-colors duration-300"
+    >
+      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6 sm:p-8 md:p-10 transition-all duration-300">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
-          <h2 className="text-3xl font-bold text-secondary">Get in Touch</h2>
-          <div className="flex items-center text-secondary mt-2 sm:mt-0">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)]">
+            Get in Touch
+          </h2>
+          <div className="flex items-center text-[var(--color-secondary)] mt-2 sm:mt-0">
             <FaLock className="mr-1" />
             <span className="text-sm">Your data is secure</span>
           </div>
         </div>
-        <p className="mb-4 text-sm text-secondary">
+        <p className="mb-4 text-sm sm:text-base text-[var(--color-secondary)]">
           We value your privacy and ensure your information is protected.
         </p>
         {/* Error Summary for screen readers */}
@@ -183,12 +192,12 @@ const ContactForm: React.FC = () => {
             title="Write your message here"
           />
           <div className="mb-6 flex flex-col">
-            <div>
+            <div className="flex justify-center">
               <ReCAPTCHA
                 ref={recaptchaRef}
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY as string}
                 className="w-full scale-75 sm:scale-100"
-                style={{ transformOrigin: "0  0" }}
+                style={{ transformOrigin: "0 0" }}
                 onChange={handleRecaptchaChange}
               />
             </div>
@@ -207,16 +216,28 @@ const ContactForm: React.FC = () => {
           <div className="mt-6">
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-accent text-white rounded-full hover:bg-accent-dark transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent"
+              disabled={isSubmitting}
+              className={`w-full px-6 py-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
+                isSubmitting
+                  ? "bg-[var(--color-accent)] bg-opacity-50 cursor-not-allowed"
+                  : "bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]"
+              }`}
             >
-              Send Your Message
+              {isSubmitting ? (
+                <>
+                  <FaSpinner className="animate-spin inline-block mr-2" />
+                  Sending...
+                </>
+              ) : (
+                "Send Your Message"
+              )}
             </button>
           </div>
-          <p className="mt-2 text-xs text-secondary text-justify">
+          <p className="mt-2 text-xs sm:text-sm text-[var(--color-secondary)] text-justify">
             By clicking “Send Your Message”, you agree to our Privacy Policy.
             Your data is secure and will never be shared.
           </p>
-          <p className="mt-1 text-xs text-secondary italic">
+          <p className="mt-1 text-xs sm:text-sm text-[var(--color-secondary)] italic">
             We’ll get back to you promptly.
           </p>
         </form>

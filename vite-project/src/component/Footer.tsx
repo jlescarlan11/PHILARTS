@@ -13,12 +13,18 @@ import { MdArrowUpward } from "react-icons/md";
 // -------------------------
 const BrandInfo: React.FC = () => (
   <div className="text-center md:text-left">
-    <h2 className="text-2xl font-bold text-secondary">Nutcha Bite</h2>
-    <p className="mt-2 text-sm text-secondary">
+    <h2
+      className="text-2xl font-bold"
+      style={{ color: "var(--color-secondary)" }}
+    >
+      Nutcha Bite
+    </h2>
+    <p className="mt-2 text-sm" style={{ color: "var(--color-secondary)" }}>
       Contact us:&nbsp;
       <a
         href="mailto:info@nutchabite.com"
-        className="text-accent hover:underline focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
+        style={{ color: "var(--color-accent)" }}
+        className="hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-colors"
       >
         info@nutchabite.com
       </a>
@@ -63,7 +69,8 @@ const SocialLinks: React.FC = () => {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          className="text-accent transition-transform duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-accent"
+          style={{ color: "var(--color-accent)" }}
+          className="transition-transform duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
         >
           {icon}
         </a>
@@ -75,34 +82,129 @@ const SocialLinks: React.FC = () => {
 // -------------------------
 // NewsletterSignup Component
 // -------------------------
-const NewsletterSignup: React.FC = () => (
-  <div className="mt-6 md:mt-0 flex flex-col items-center">
-    <h3 className="text-lg font-semibold text-secondary">Stay Updated!</h3>
-    <form className="flex mt-2" aria-label="Newsletter Signup Form">
-      <input
-        type="email"
-        placeholder="Your email"
-        className="px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-accent transition-colors duration-300"
-        aria-label="Email address"
-      />
-      <button
-        type="submit"
-        className="bg-accent text-[var(--color-primary)] bg-[var(--color-accent)] px-4 py-2 rounded-r-md hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-accent transition-colors duration-300"
+const NewsletterSignup: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    type: "error" | "success";
+    message: string;
+  } | null>(null);
+
+  // Validate email using a simple regex.
+  const validateEmail = (email: string): boolean => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFeedback(null);
+
+    if (!validateEmail(email)) {
+      setFeedback({
+        type: "error",
+        message: "Please enter a valid email address.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Simulate an API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setFeedback({ type: "success", message: "Subscribed successfully!" });
+      setEmail("");
+    } catch (error) {
+      setFeedback({
+        type: "error",
+        message: "Subscription failed. Please try again later.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 md:mt-0 flex flex-col items-center">
+      <h3
+        className="text-lg font-semibold"
+        style={{ color: "var(--color-secondary)" }}
       >
-        Subscribe
-      </button>
-    </form>
-  </div>
-);
+        Stay Updated!
+      </h3>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col md:flex-row mt-2 w-full max-w-xs"
+        aria-label="Newsletter Signup Form"
+      >
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Your email"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md md:rounded-l-md md:rounded-r-none focus:outline-none focus:ring-2 transition-colors duration-300"
+          aria-label="Email address"
+          style={{ borderColor: "var(--color-accent)" }}
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full mt-2 md:mt-0 md:w-auto bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded-md md:rounded-r-md md:rounded-l-none hover:bg-opacity-80 focus:outline-none focus:ring-2 transition-colors duration-300 disabled:opacity-50"
+        >
+          {loading ? (
+            <svg
+              className="animate-spin h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+          ) : (
+            "Subscribe"
+          )}
+        </button>
+      </form>
+      {feedback && (
+        <div aria-live="polite">
+          <p
+            className={`mt-2 text-sm ${
+              feedback.type === "success" ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {feedback.message}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // -------------------------
 // TrustSignals Component
 // -------------------------
 const TrustSignals: React.FC = () => (
-  <div className="mt-6 flex flex-col items-center justify-center">
+  <div className="mt-4 flex flex-col items-center justify-center">
     <div className="flex items-center space-x-2 justify-center">
-      <FaShieldAlt className="text-accent" size={20} aria-hidden="true" />
-      <span className="text-xs text-secondary">
+      <FaShieldAlt
+        size={20}
+        aria-hidden="true"
+        style={{ color: "var(--color-accent)" }}
+      />
+      <span className="text-xs" style={{ color: "var(--color-secondary)" }}>
         Secure transactions &amp; trusted by thousands
       </span>
     </div>
@@ -119,11 +221,7 @@ const BackToTop: React.FC = () => {
 
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      setIsVisible(window.pageYOffset > 300);
     };
     window.addEventListener("scroll", toggleVisibility);
     return () => window.removeEventListener("scroll", toggleVisibility);
@@ -134,10 +232,10 @@ const BackToTop: React.FC = () => {
       {isVisible && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 bg-accent text-[var(--color-primary)] bg-[var(--color-accent)] px-2 py-2 rounded-full shadow-lg hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-300"
+          className="fixed bottom-6 right-6 bg-[var(--color-accent)] text-[var(--color-primary)] px-3 py-3 rounded-full shadow-lg hover:bg-opacity-80 focus:outline-none focus:ring-2 transition-all duration-300"
           aria-label="Back to top"
         >
-          <MdArrowUpward />
+          <MdArrowUpward size={24} />
         </button>
       )}
     </>
@@ -149,9 +247,13 @@ const BackToTop: React.FC = () => {
 // -------------------------
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col space-y-6 md:space-y-0 md:flex-row md:justify-between md:items-center">
+    <footer
+      style={{ backgroundColor: "var(--color-primary)" }}
+      className="py-4"
+    >
+      <div className="max-w-7xl mx-auto px-4 flex flex-col space-y-4 md:space-y-0 md:flex-row md:justify-between md:items-center">
         <BrandInfo />
         <SocialLinks />
         <NewsletterSignup />
@@ -159,9 +261,12 @@ const Footer: React.FC = () => {
 
       <TrustSignals />
 
-      <div className="mt-8 border-t border-gray-300 pt-4">
-        <div className="max-w-7xl mx-auto px-4 flex  justify-center space-y-4 ">
-          <p className="text-xs text-secondary">
+      <div
+        className="mt-4 border-t"
+        style={{ borderColor: "var(--color-accent)" }}
+      >
+        <div className="max-w-7xl mx-auto pt-4 flex justify-center">
+          <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
             &copy; {currentYear} John Lester Escarlan | All rights reserved
           </p>
         </div>
