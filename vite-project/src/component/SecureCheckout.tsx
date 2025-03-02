@@ -518,7 +518,7 @@ const SecureCheckout: React.FC = () => {
     cardName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [processing, setProcessing] = useState(false);
+  const [, setProcessing] = useState(false);
   const [ariaMessage, setAriaMessage] = useState("");
   const [, setPaymentSuccess] = useState(false);
   const [toast, setToast] = useState("");
