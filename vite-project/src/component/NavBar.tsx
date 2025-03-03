@@ -9,11 +9,6 @@ import { useCart } from "../hooks/useCart";
 // ----------------------
 // Utility: Throttle Hook
 // ----------------------
-/**
- * useThrottle - custom hook to throttle a function call.
- * @param callback - function to throttle.
- * @param delay - delay in milliseconds.
- */
 const useThrottle = (callback: (...args: any[]) => void, delay: number) => {
   const lastCall = useRef(0);
   return useCallback(
@@ -31,12 +26,8 @@ const useThrottle = (callback: (...args: any[]) => void, delay: number) => {
 // -------------------------
 // Utility: Analytics Tracker
 // -------------------------
-/**
- * trackEvent - Enhanced analytics tracking with error handling.
- */
 const trackEvent = (eventName: string, details: Record<string, any>) => {
   try {
-    // Replace with your analytics integration (e.g., Google Analytics)
     if (window.gtag) {
       window.gtag("event", eventName, details);
     } else {
@@ -53,13 +44,20 @@ const trackEvent = (eventName: string, details: Record<string, any>) => {
 interface NavItemProps {
   name: string;
   link: string;
+  id: string;
   isActive: boolean;
   onClick: (link: string) => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ name, link, isActive, onClick }) => {
+const NavItem: React.FC<NavItemProps> = ({
+  name,
+  link,
+  id,
+  isActive,
+  onClick,
+}) => {
   return (
-    <li>
+    <li className="w-full">
       <HashLink
         smooth
         to={link}
@@ -69,10 +67,9 @@ const NavItem: React.FC<NavItemProps> = ({ name, link, isActive, onClick }) => {
           trackEvent("nav_click", { element: "NavItem", name, link });
         }}
         aria-current={isActive ? "page" : undefined}
-        className={`block  px-3 py-2 rounded transition-transform duration-300 ease-in-out transform
-          hover:scale-105 hover:text-[var(--color-accent)] ${
-            isActive ? "font-bold border-b-2 border-[var(--color-accent)]" : ""
-          }`}
+        className={`block px-4 py-3 sm:px-5 sm:py-3 md:px-6 md:py-4 text-sm sm:text-base md:text-lg transition-transform duration-300 ease-in-out transform hover:scale-105 hover:text-[var(--color-accent)] ${
+          isActive ? "font-bold border-b-2 border-[var(--color-accent)]" : ""
+        }`}
       >
         {name}
       </HashLink>
@@ -81,17 +78,16 @@ const NavItem: React.FC<NavItemProps> = ({ name, link, isActive, onClick }) => {
 };
 
 // ------------------------
-// Searchable Content Items (example data)
+// Navigation Content Items (updated for consistency)
 // ------------------------
 const contentItems = [
-  { id: 1, title: "About", url: "/#about" },
-  { id: 2, title: "Menu", url: "/#menu" },
-  { id: 3, title: "Testimonials", url: "/#testimonials" },
-  { id: 4, title: "FAQ", url: "/#faq" },
-  { id: 5, title: "Contact", url: "/#contact" },
+  { id: "#about", title: "About", url: "/#about" },
+  { id: "#menu", title: "Menu", url: "/#menu" },
+  { id: "#testimonials", title: "Testimonials", url: "/#testimonials" },
+  { id: "#faq", title: "FAQ", url: "/#faq" },
+  { id: "#contact", title: "Contact", url: "/#contact" },
 ];
 
-// Structured data (JSON‑LD) for SEO
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "SiteNavigationElement",
@@ -100,23 +96,25 @@ const structuredData = {
   mainEntity: contentItems.map((item) => ({
     "@type": "WebPage",
     name: item.title,
-    url: `https://nutchabite.com/${item.url}`,
+    url: `https://nutchabite.com${item.url}`,
   })),
 };
 
-// ------------------------
-// Main Navbar Component
-// ------------------------
 const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false); // Mobile menu state
-  const [activeLink, setActiveLink] = useState("#home"); // Active navigation link
-  const [menuStatus, setMenuStatus] = useState("Mobile menu closed"); // ARIA live region status
-  const [darkMode, setDarkMode] = useState(false); // Dark mode state
-  const [] = useState(""); // Search query for filtering
+  // Set default active link to "#hero" (landing section)
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState("#hero");
+  const [menuStatus, setMenuStatus] = useState("Mobile menu closed");
+  const [darkMode, setDarkMode] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  // Get the cart items from context and calculate count (updates automatically on cartItems change)
+  const { cartItems } = useCart();
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // ------------------------
-  // Dark Mode Persistence
+  // Dark Mode Preference
   // ------------------------
   useEffect(() => {
     const savedPreference = localStorage.getItem("darkMode");
@@ -149,20 +147,15 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const sections = document.querySelectorAll("section");
     const observer = new IntersectionObserver(
-      (entries) => {
-        throttledIntersection(entries);
-      },
+      (entries) => throttledIntersection(entries),
       {
         root: null,
         rootMargin: "0px",
         threshold: 0.6,
       }
     );
-
     sections.forEach((section) => observer.observe(section));
-    return () => {
-      sections.forEach((section) => observer.unobserve(section));
-    };
+    return () => sections.forEach((section) => observer.unobserve(section));
   }, [throttledIntersection]);
 
   // ------------------------
@@ -177,7 +170,7 @@ const Navbar: React.FC = () => {
     });
   };
 
-  // Close mobile menu (used by backdrop, dedicated close button)
+  // Close mobile menu (used by backdrop and when a menu item is clicked)
   const closeMenu = () => {
     setIsOpen(false);
     setMenuStatus("Mobile menu closed");
@@ -188,8 +181,10 @@ const Navbar: React.FC = () => {
   // Handle Navigation Item Click
   // ------------------------
   const handleNavItemClick = (link: string) => {
-    setActiveLink(link);
-    setIsOpen(false);
+    // Ensure activeLink matches the section hash
+    const hash = link.startsWith("/#") ? link.slice(1) : link;
+    setActiveLink(hash);
+    closeMenu(); // Automatically close mobile menu on item click
     trackEvent("nav_item_click", { link });
   };
 
@@ -205,17 +200,6 @@ const Navbar: React.FC = () => {
     });
   };
 
-  // ------------------------
-  // Search Functionality
-  // ------------------------
-
-  // Optionally, handle Enter key in search input to select first result
-
-  // Filter the content items based on search query (case-insensitive)
-
-  const navigate = useNavigate();
-  const { cartItems } = useCart();
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   return (
     <>
       {/* Skip to Content Link */}
@@ -252,7 +236,7 @@ const Navbar: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-[var(--nav-height)]">
           {/* Logo Section */}
-          <div className="flex-shrink-0 ">
+          <div className="flex-shrink-0 mr-4">
             <HashLink
               smooth
               to="/#hero"
@@ -265,13 +249,9 @@ const Navbar: React.FC = () => {
                 alt="Nutcha Bite logo"
                 className="h-8 w-auto transition-transform duration-300 ease-in-out transform hover:scale-105"
               />
-              <h1 className="shrikhand-regular text-xl text-[var(--color-tertiary)]">
+              <h1 className="shrikhand-regular text-xl sm:text-2xl md:text-3xl text-[var(--color-secondary)]">
                 NUTCHA BITES
               </h1>
-
-              {/* <h6 className="poppins-regular text-xs">
-                Old School Crunch, New School Vibes
-              </h6> */}
             </HashLink>
           </div>
 
@@ -283,97 +263,86 @@ const Navbar: React.FC = () => {
                   key={item.url}
                   name={item.title}
                   link={item.url}
-                  isActive={activeLink === item.url}
+                  id={item.id}
+                  isActive={activeLink === item.id}
                   onClick={handleNavItemClick}
                 />
               ))}
             </ul>
           </nav>
 
-          {/* Desktop CTA Button */}
-          <div className="hidden md:flex items-center gap-2">
-            <div className="flex items-center gap-4">
+          {/* Desktop CTAs */}
+          <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={toggleDarkMode}
+              title="Toggle dark mode"
+              aria-pressed={darkMode}
+              className="p-2 rounded focus:outline-none focus-visible:ring focus-visible:ring-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors duration-300"
+            >
+              {darkMode ? (
+                <MdLightMode className="w-6 h-6" />
+              ) : (
+                <MdDarkMode className="w-6 h-6" />
+              )}
+            </button>
+            <div className="relative">
               <button
-                onClick={toggleDarkMode}
-                title="Toggle dark mode"
-                aria-pressed={darkMode}
-                className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
+                title="Go to Cart"
+                onClick={() => navigate("/cart")}
+                className="p-2 rounded focus:outline-none focus-visible:ring focus-visible:ring-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors duration-300"
               >
-                {darkMode ? (
-                  <MdLightMode className="size-6" />
-                ) : (
-                  <MdDarkMode className="size-6" />
-                )}
+                <MdShoppingCart className="w-6 h-6" />
               </button>
-              <div className="relative mr-4">
-                <button
-                  title="Go to Cart"
-                  onClick={() => navigate("/cart")}
-                  className="p-2 rounded focus:outline-none hover:bg-[var(--color-accent-20)] transition-colors duration-300 ripple"
-                >
-                  <MdShoppingCart className="size-6" />
-                </button>
-                {(cartCount ?? 0) > 0 && (
-                  <span className="absolute top-0 right-0 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs rounded-full px-1">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[var(--color-accent)] text-[var(--color-primary)] text-xs font-bold rounded-full px-2 py-0.5">
+                  {cartCount}
+                </span>
+              )}
             </div>
-            <div>
-              <HashLink
-                smooth
-                to="\#products"
-                onClick={() => {
-                  handleNavItemClick("#order");
-                  trackEvent("cta_click", {
-                    element: "Order Now",
-                    link: "#order",
-                  });
-                }}
-                title="Order Now"
-                className="bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-              >
-                Order Now
-              </HashLink>
-            </div>
+            <HashLink
+              smooth
+              to="/#products"
+              onClick={() => handleNavItemClick("/#order")}
+              title="Order Now"
+              className="bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90 focus:outline-none focus-visible:ring focus-visible:ring-[var(--color-accent)]"
+            >
+              Order Now
+            </HashLink>
           </div>
 
-          <div className=" md:hidden flex items-center gap-2">
-            <div className="flex items-center gap-4">
-              {/* Mobile Menu Toggle Button */}
-              <button
-                onClick={toggleMenu}
-                type="button"
-                aria-label="Toggle navigation menu"
-                aria-expanded={isOpen}
-                aria-controls="mobile-menu"
-                className="md:hidden text-[var(--color-secondary)] hover:text-[var(--color-accent)] focus:outline-none ripple"
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={toggleMenu}
+              type="button"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+              className="text-[var(--color-secondary)] hover:text-[var(--color-accent)] focus:outline-none focus-visible:ring focus-visible:ring-[var(--color-accent)] transition-colors duration-300"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  {isOpen ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
-                </svg>
-              </button>
-            </div>
+                {isOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -383,70 +352,22 @@ const Navbar: React.FC = () => {
             id="mobile-menu"
             role="navigation"
             ref={mobileMenuRef}
-            className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden z-50 ${
+            className={`md:hidden bg-[var(--color-primary)] transition-all duration-500 ease-in-out overflow-hidden z-50 ${
               isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <ul className="px-2 pt-2 pb-3 space-y-1">
+            <ul className="flex flex-col space-y-4 px-4 py-6">
               {contentItems.map((item) => (
                 <NavItem
                   key={item.url}
                   name={item.title}
                   link={item.url}
-                  isActive={activeLink === item.url}
+                  id={item.id}
+                  isActive={activeLink === item.id}
                   onClick={handleNavItemClick}
                 />
               ))}
-
-              <li>
-                <button
-                  onClick={toggleDarkMode}
-                  title="Toggle dark mode"
-                  aria-pressed={darkMode}
-                  className="flex items-center gap-2  w-full border border-[var(--color-accent)] text-[var(--color-secondary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-                >
-                  {darkMode ? (
-                    <>
-                      <MdLightMode className="size-6" />
-                      Toggle Light Mode
-                    </>
-                  ) : (
-                    <>
-                      <MdDarkMode className="size-6" />
-                      Toggle Light Mode
-                    </>
-                  )}
-                </button>
-              </li>
-
-              <li>
-                <button
-                  title="Go to Cart"
-                  onClick={() => navigate("/cart")}
-                  className="w-full bg-[var(--color-accent)] flex items-center gap-2 text-[var(--color-primary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-                >
-                  <MdShoppingCart className="size-6" />
-                  Shopping Cart
-                </button>
-              </li>
-
-              <li>
-                <HashLink
-                  smooth
-                  to="\#products"
-                  onClick={() => {
-                    handleNavItemClick("#menu");
-                    trackEvent("cta_click", {
-                      element: "Order Now",
-                      link: "#order",
-                    });
-                  }}
-                  title="Order Now"
-                  className="block bg-[var(--color-accent)] text-[var(--color-primary)] px-3 py-2 rounded transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-opacity-90"
-                >
-                  Order Now
-                </HashLink>
-              </li>
+              {/* Additional mobile options can be added here */}
             </ul>
           </nav>
         </FocusLock>
