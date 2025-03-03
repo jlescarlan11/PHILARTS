@@ -183,18 +183,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({
             Show Less
           </button>
         )}
-        {/* Inline CTA for additional engagement */}
-        {isLong && (
-          <p className="mt-2 pl-2 sm:pl-4 text-sm">
-            <a
-              href="/support/ingredients"
-              className="underline text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
-              aria-label="Learn more about our ingredients"
-            >
-              Learn more about our ingredients
-            </a>
-          </p>
-        )}
+
         {/* "Was this helpful?" feedback buttons */}
         <div className="mt-2 pl-2 sm:pl-4 flex items-center space-x-2 sm:space-x-4">
           {feedbackSubmitted ? (

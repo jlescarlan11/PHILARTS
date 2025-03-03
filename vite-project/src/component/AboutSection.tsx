@@ -89,27 +89,30 @@ const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
       <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-4">
         About Nutcha Bites
       </h2>
-      <p className="mb-4 text-lg">
+      <p className="mb-4 text-lg text-justify">
         Nestled in the heart of Iloilo, Nutcha Bite celebrates a rich culinary
         heritage by infusing a classic delicacy with an unexpected twist of
         matcha. Our recipe honors centuries-old traditions while embracing
         modern innovation.
       </p>
-      <p className="mb-4 text-lg">
+      <p className="mb-4 text-lg text-justify">
         Each bite is a journey into the vibrant flavors of Iloilo – where
         time-honored techniques meet subtle, earthy matcha notes. The result is
         a delicacy that captivates both the palate and the imagination.
       </p>
-      <p className="mb-4 text-lg">
+      <p className="mb-4 text-lg text-justify">
         At Nutcha Bite, passion, tradition, and creativity converge to deliver
         an unforgettable taste experience that feels both nostalgic and
         refreshingly contemporary.
       </p>
       {/* Trust signal: Testimonial snippet */}
       <div className="mb-6 p-4 border-l-4 border-[var(--color-tertiary)] bg-[var(--color-tertiary-10)] bg-opacity-80 rounded shadow-sm">
-        <p className="italic text-[var(--color-secondary)]">
+        <p className="italic text-[var(--color-secondary)] text-justify">
           "Nutcha Bite transports me back to my childhood while introducing me
-          to exciting new flavors. A true masterpiece!" – Satisfied Customer
+          to exciting new flavors. A true masterpiece!"
+        </p>
+        <p className="italic text-[var(--color-secondary)] text-justify">
+          – Satisfied Customer
         </p>
       </div>
       <HashLink

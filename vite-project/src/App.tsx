@@ -11,6 +11,7 @@ import SecureCheckout from "./component/SecureCheckout";
 import OrderConfirmation from "./component/OrderConfirmation";
 import ContactForm from "./component/ContactForm";
 import Footer from "./component/Footer";
+import ErrorPage from "./component/ErrorPage";
 
 const App: React.FC = () => {
   return (
@@ -49,7 +50,7 @@ const App: React.FC = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<SecureCheckout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          {/* <Route path="*" element={<h1>404 Not Found</h1>} /> */}
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </main>
     </Router>
