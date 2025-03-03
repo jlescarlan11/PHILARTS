@@ -481,7 +481,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       itemType="https://schema.org/Product"
     >
       {/* Transparent gradient overlay for readability */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[var(--color-tertiary-40)] via-[var(--color-primary-20)] to-[var(--color-primary-80)]"></div>
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[var(--color-tertiary-20)] via-[var(--color-tertiary-40)] to-[var(--color-tertiary-70)]"></div>
       {/* Display error message for screen readers if the image fails */}
       {error && (
         <div role="alert" aria-live="assertive" className="sr-only">
@@ -528,7 +528,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </button>
       </div>
       {/* Product details overlaid on the bottom */}
-      <div className="absolute bottom-4 left-4 right-4 text-[var(--color-secondary)]">
+      <div className="absolute bottom-4 left-4 right-4 text-[var(--color-primary)]">
         <h3 className="text-2xl font-bold">{product.name}</h3>
         <p className="text-sm">{product.description}</p>
         <p className="text-xs font-semibold mt-1">

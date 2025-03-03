@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartItem, useCart } from "../hooks/useCart";
+import { HashLink } from "react-router-hash-link";
+import { IoMdEye, IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
+import {
+  MdAdd,
+  MdBookmarkAdd,
+  MdBookmarkAdded,
+  MdDelete,
+  MdRemove,
+} from "react-icons/md";
 
 // -------------------------
 // Analytics Tracker Utility
-// Define trackEvent so it is available in our component.
+// -------------------------
 const trackEvent = (eventName: string, details: Record<string, any>) => {
   try {
     if (window.gtag) {
@@ -23,7 +32,6 @@ const trackEvent = (eventName: string, details: Record<string, any>) => {
 const groupCartItems = (items: CartItem[]): CartItem[] => {
   const grouped: Record<string, CartItem> = {};
   items.forEach((item) => {
-    // Include size in key if available.
     const key = `${item.name}-${item.price}-${item.size || "default"}`;
     if (grouped[key]) {
       grouped[key].quantity += item.quantity;
@@ -38,14 +46,14 @@ const groupCartItems = (items: CartItem[]): CartItem[] => {
 // Toast Component
 // Displays temporary toast notifications.
 const Toast: React.FC<{ message: string }> = ({ message }) => (
-  <div className="fixed bottom-4 right-4 bg-[var(--color-accent)] text-white px-4 py-2 rounded shadow-md animate-fadeIn">
+  <div className="fixed bottom-4 right-4 bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded shadow-md animate-fadeIn">
     {message}
   </div>
 );
 
 // -------------------------
 // ConfirmModal Component
-// Custom modal to confirm cart clearance. ARIA attributes added.
+// Custom modal to confirm cart clearance.
 interface ConfirmModalProps {
   name: string;
   message: string;
@@ -70,10 +78,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       onClick={onCancel}
       aria-hidden="true"
     ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
+    <div className="relative bg-[var(--color-primary)] p-6 sm:p-8 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
       <h3
         id="confirm-modal-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
+        className="text-2xl sm:text-3xl font-bold text-[var(--color-secondary)]"
       >
         {name}
       </h3>
@@ -86,14 +94,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <div className="mt-4 flex justify-end space-x-2">
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label="Cancel"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label="Confirm clear cart"
         >
           Clear Cart
@@ -104,7 +112,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 );
 
 // -------------------------
-// ViewProductModal Component (Optional)
+// ViewProductModal Component
 // Displays detailed product info (including size) in a modal.
 const ViewProductModal: React.FC<{ item: CartItem; onClose: () => void }> = ({
   item,
@@ -122,10 +130,10 @@ const ViewProductModal: React.FC<{ item: CartItem; onClose: () => void }> = ({
       onClick={onClose}
       aria-hidden="true"
     ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10">
+    <div className="relative bg-[var(--color-primary)] p-6 sm:p-8 rounded-lg max-w-md w-full z-10">
       <h3
         id="view-product-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
+        className="text-2xl sm:text-3xl font-bold text-[var(--color-secondary)]"
       >
         {item.name}
       </h3>
@@ -144,7 +152,7 @@ const ViewProductModal: React.FC<{ item: CartItem; onClose: () => void }> = ({
       </p>
       <button
         onClick={onClose}
-        className="mt-4 px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+        className="mt-4 px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
         aria-label="Close product details"
       >
         Close
@@ -179,6 +187,11 @@ const Cart: React.FC = () => {
       ? JSON.parse(localStorage.getItem("favorites")!)
       : [];
   });
+  const [bookmarks, setBookmarks] = useState<string[]>(() => {
+    return localStorage.getItem("bookmarks")
+      ? JSON.parse(localStorage.getItem("bookmarks")!)
+      : [];
+  });
   const navigate = useNavigate();
 
   // Group duplicate items to ensure proper display.
@@ -193,6 +206,31 @@ const Cart: React.FC = () => {
       localStorage.setItem("favorites", JSON.stringify(updated));
       return updated;
     });
+  };
+
+  // Toggle bookmark state in localStorage.
+  const toggleBookmark = (id: string) => {
+    setBookmarks((prev) => {
+      const updated = prev.includes(id)
+        ? prev.filter((bid) => bid !== id)
+        : [...prev, id];
+      localStorage.setItem("bookmarks", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // Handle Save For Later: if already bookmarked, remove and show toast accordingly.
+  const handleSaveForLater = (id: string, itemName: string, size: string) => {
+    const isBookmarked = bookmarks.includes(id);
+    toggleBookmark(id);
+    saveForLater(id, itemName, size);
+    if (isBookmarked) {
+      showToast(`${itemName} is removed for later`);
+      trackEvent("item_removed_from_saved", { itemName });
+    } else {
+      showToast(`${itemName} is added to favorites`);
+      trackEvent("favorite_added", { itemName });
+    }
   };
 
   // showToast helper: displays a toast and updates ARIA live region.
@@ -225,13 +263,6 @@ const Cart: React.FC = () => {
     trackEvent("item_removed", { itemName });
   };
 
-  // Handle saving an item for later.
-  const handleSaveForLater = (id: string, itemName: string, size: string) => {
-    saveForLater(id, itemName, size);
-    showToast(`${itemName} saved for later`);
-    trackEvent("item_saved_for_later", { itemName });
-  };
-
   // Handle coupon code application.
   const handleApplyCoupon = () => {
     const discountRate = applyCoupon(couponCode);
@@ -253,28 +284,40 @@ const Cart: React.FC = () => {
   const handleCheckout = () => {
     navigate("/checkout");
   };
-  const handleContinueShopping = () => {
-    navigate("/menu");
-  };
 
-  if (loading) return <p className="text-center p-4">Loading cart...</p>;
+  if (loading)
+    return (
+      <p className="text-center p-4 text-[var(--color-secondary)]">
+        Loading cart...
+      </p>
+    );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="max-w-6xl mx-auto min-h-screen p-4 sm:p-6 bg-[var(--color-primary)] grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Left Column: Cart Items */}
       <div>
-        <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-6">
-          Your Cart
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)]">
+            Your Cart
+          </h2>
+          {groupedItems.length > 0 && (
+            <button
+              onClick={() => setShowConfirmModal(true)}
+              className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              aria-label="Clear cart"
+            >
+              Clear Cart
+            </button>
+          )}
+        </div>
         {groupedItems.length === 0 ? (
           <>
-            <p>Your cart is empty.</p>
-            {/* Recommended for You (Optional) */}
-            <div className="mt-6 p-4 bg-gray-100 rounded">
+            <p className="text-[var(--color-secondary)]">Your cart is empty.</p>
+            <div className="mt-6 p-4 bg-[var(--color-primary)] rounded border">
               <h3 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
                 Recommended for You
               </h3>
-              <p className="text-sm">
+              <p className="text-sm text-[var(--color-secondary)]">
                 Check out our latest Nutcha Bite offerings to add to your cart.
               </p>
             </div>
@@ -285,22 +328,39 @@ const Cart: React.FC = () => {
               <li
                 key={item.id}
                 className="relative rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
-                // Use product image as background with a gradient overlay.
                 style={{
                   backgroundImage: `url(${item.image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
               >
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-white/70 to-black/80"></div>
-                {/* Overlaid product details */}
-
-                {/* Icon buttons overlay arranged vertically at top-left */}
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[var(--color-tertiary-20)] via-[var(--color-tertiary-40)] to-[var(--color-tertiary-70)]"></div>
+                <div className="relative z-10 pt-36 pb-4 px-4 text-[var(--color-primary)]">
+                  <p className="text-lg sm:text-xl font-bold ">{item.name}</p>
+                  {item.size && (
+                    <p className="text-sm sm:text-base ">Size: {item.size}</p>
+                  )}
+                  <p className="text-sm sm:text-base">
+                    Unit Price: ${item.price.toFixed(2)}
+                  </p>
+                  <p className="text-sm sm:text-base ">
+                    Total: ${(item.price * item.quantity).toFixed(2)}
+                  </p>
+                </div>
                 <div className="absolute top-2 right-2 flex flex-col space-y-1 z-20">
                   <button
-                    onClick={() => toggleFavorite(item.id)}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    onClick={() => {
+                      const alreadyFav = favorites.includes(item.id);
+                      toggleFavorite(item.id);
+                      if (alreadyFav) {
+                        showToast(`${item.name} is removed from favorites`);
+                        trackEvent("favorite_removed", { itemName: item.name });
+                      } else {
+                        showToast(`${item.name} is added to favorites`);
+                        trackEvent("favorite_added", { itemName: item.name });
+                      }
+                    }}
+                    className="w-10 h-10 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
                     aria-label={
                       favorites.includes(item.id)
                         ? `Remove ${item.name} from favorites`
@@ -308,82 +368,26 @@ const Cart: React.FC = () => {
                     }
                   >
                     {favorites.includes(item.id) ? (
-                      // Filled heart icon.
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-red-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 015.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-                      </svg>
+                      <IoMdHeart className="text-red-500 text-xl" />
                     ) : (
-                      // Outline heart icon.
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
-                        />
-                      </svg>
+                      <IoMdHeartEmpty className="text-[var(--color-primary)] text-xl" />
                     )}
                   </button>
                   <button
                     onClick={() => setViewProduct(item)}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    className="w-10 h-10 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
                     aria-label={`View product details for ${item.name}`}
                   >
-                    {/* Eye icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-[var(--color-accent)]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
+                    <IoMdEye className="text-[var(--color-primary)] text-xl" />
                   </button>
                   <button
                     onClick={() =>
                       handleRemove(item.id, item.name, item.size || "default")
                     }
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-400"
+                    className="w-10 h-10 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
                     aria-label={`Remove ${item.name} from cart`}
                   >
-                    {/* Trash can icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-red-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a1 1 0 011 1v2H9V4a1 1 0 011-1z"
-                      />
-                    </svg>
+                    <MdDelete className="text-[var(--color-primary)] text-xl" />
                   </button>
                   <button
                     onClick={() =>
@@ -393,41 +397,17 @@ const Cart: React.FC = () => {
                         item.size || "default"
                       )
                     }
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-10 h-10 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
                     aria-label={`Save ${item.name} for later`}
                   >
-                    {/* Bookmark icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-blue-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 5v14l7-7 7 7V5a2 2 0 00-2-2H7a2 2 0 00-2 2z"
-                      />
-                    </svg>
+                    {bookmarks.includes(item.id) ? (
+                      <MdBookmarkAdded className="text-[var(--color-primary)] text-xl" />
+                    ) : (
+                      <MdBookmarkAdd className="text-[var(--color-primary)] text-xl" />
+                    )}
                   </button>
                 </div>
-                {/* Overlaid product details */}
-                <div className="relative z-10 pt-36 pb-4 px-4">
-                  <p className="text-lg font-bold text-white">{item.name}</p>
-                  {item.size && (
-                    <p className="text-sm text-white">Size: {item.size}</p>
-                  )}
-                  <p className="text-sm text-white">
-                    Unit Price: ${item.price.toFixed(2)}
-                  </p>
-                  <p className="text-sm text-white">
-                    Total: ${(item.price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
-                {/* Quantity Controls - Positioned at bottom center */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 z-20">
+                <div className="absolute bottom-2 right-2 flex bg-[var(--color-accent-10)] rounded-lg items-center space-x-2 z-20">
                   <button
                     onClick={() =>
                       handleQuantityChange(
@@ -437,12 +417,12 @@ const Cart: React.FC = () => {
                         item.name
                       )
                     }
-                    className="px-2 py-1 bg-gray-200 rounded-l hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
+                    className="px-2 py-2 bg-[var(--color-accent)] rounded-l-lg hover:bg-opacity-90 transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                     aria-label={`Decrease quantity of ${item.name}`}
                   >
-                    –
+                    <MdRemove className="text-[var(--color-primary)]" />
                   </button>
-                  <span className="text-white font-semibold">
+                  <span className="text-[var(--color-primary)] w-4 text-center font-semibold">
                     {item.quantity}
                   </span>
                   <button
@@ -454,10 +434,10 @@ const Cart: React.FC = () => {
                         item.name
                       )
                     }
-                    className="px-2 py-1 bg-gray-200 rounded-r hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-transform duration-200"
+                    className="px-2 py-2 bg-[var(--color-accent)] rounded-r-lg hover:bg-opacity-90 transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                     aria-label={`Increase quantity of ${item.name}`}
                   >
-                    +
+                    <MdAdd className="text-[var(--color-primary)]" />
                   </button>
                 </div>
               </li>
@@ -467,30 +447,40 @@ const Cart: React.FC = () => {
       </div>
       {/* Right Column: Sticky Checkout Summary */}
       <div className="lg:sticky lg:top-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-2xl font-bold mb-4">Order Summary</h3>
-          <p className="text-lg">Subtotal: ${subtotal.toFixed(2)}</p>
-          <p className="text-lg">Tax (10%): ${tax.toFixed(2)}</p>
-          <p className="text-lg">Shipping: ${shipping.toFixed(2)}</p>
+        <div className="bg-[var(--color-primary)] rounded-lg shadow p-6">
+          <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-[var(--color-secondary)]">
+            Order Summary
+          </h3>
+          <p className="text-lg text-[var(--color-secondary)]">
+            Subtotal: ${subtotal.toFixed(2)}
+          </p>
+          <p className="text-lg text-[var(--color-secondary)]">
+            Tax (10%): ${tax.toFixed(2)}
+          </p>
+          <p className="text-lg text-[var(--color-secondary)]">
+            Shipping: ${shipping.toFixed(2)}
+          </p>
           {discount > 0 && (
             <p className="text-lg text-green-600">
               Discount: -${discountAmount.toFixed(2)}
             </p>
           )}
-          <p className="text-2xl font-bold mt-4">Total: ${total.toFixed(2)}</p>
+          <p className="text-2xl font-bold mt-4 text-[var(--color-secondary)]">
+            Total: ${total.toFixed(2)}
+          </p>
           {/* Coupon Code Input */}
-          <div className="mt-4 flex items-center">
+          <div className="mt-4 flex flex-col sm:flex-row">
             <input
               type="text"
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
               placeholder="Coupon Code"
-              className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] flex-1 text-[var(--color-secondary)]"
               aria-label="Enter coupon code"
             />
             <button
               onClick={handleApplyCoupon}
-              className="ml-2 px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              className="mt-2 sm:mt-0 sm:ml-2 px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] w-full sm:w-auto"
               aria-label="Apply coupon"
             >
               Apply
@@ -498,46 +488,33 @@ const Cart: React.FC = () => {
           </div>
           {/* CTA Buttons */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-between">
-            <button
-              onClick={handleContinueShopping}
-              className="px-6 py-3 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] mb-4 sm:mb-0"
-              aria-label="Continue shopping"
+            <HashLink
+              smooth
+              to="/#menu"
+              className="w-full sm:w-auto px-6 py-3 text-center bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] mb-4 sm:mb-0"
+              aria-label="Go to Menu"
             >
-              Continue Shopping
-            </button>
+              Go to Menu
+            </HashLink>
             <button
               onClick={handleCheckout}
-              className="px-6 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
               aria-label="Proceed to Secure Checkout"
             >
               Proceed to Secure Checkout
             </button>
           </div>
-          {/* Persuasive Banner */}
           {subtotal > 0 && subtotal < 50 && (
             <p className="mt-4 text-sm text-[var(--color-secondary)]">
               Free shipping on orders over $50!
             </p>
           )}
-          {/* Clear Cart Button moved into Checkout Summary */}
-          {groupedItems.length > 0 && (
-            <button
-              onClick={() => setShowConfirmModal(true)}
-              className="mt-4 w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400"
-              aria-label="Clear cart"
-            >
-              Clear Cart
-            </button>
-          )}
         </div>
       </div>
-      {/* ARIA live region for cart updates */}
       <div aria-live="polite" className="sr-only">
         {ariaAnnouncement}
       </div>
-      {/* Toast Notification */}
       {toast && <Toast message={toast} />}
-      {/* Confirm Clear Cart Modal */}
       {showConfirmModal && (
         <ConfirmModal
           name="Clear Cart"
@@ -550,7 +527,6 @@ const Cart: React.FC = () => {
           onCancel={() => setShowConfirmModal(false)}
         />
       )}
-      {/* View Product Modal */}
       {viewProduct && (
         <ViewProductModal
           item={viewProduct}
