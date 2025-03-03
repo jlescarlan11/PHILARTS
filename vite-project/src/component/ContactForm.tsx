@@ -125,22 +125,26 @@ const ContactForm: React.FC = () => {
       id="contact"
       className="bg-[var(--color-primary)] py-12 px-4 sm:px-6 md:px-8 transition-colors duration-300"
     >
-      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6 sm:p-8 md:p-10 transition-all duration-300">
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
+      <div className="w-full max-w-lg mx-auto bg-[var(--color-primary)] rounded-lg shadow-lg p-6 sm:p-8 md:p-10 space-y-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between">
           <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)]">
             Get in Touch
           </h2>
-          <div className="flex items-center text-[var(--color-secondary)] mt-2 sm:mt-0">
+          <div className="flex items-center mt-2 sm:mt-0 text-[var(--color-secondary)]">
             <FaLock className="mr-1" />
             <span className="text-sm">Your data is secure</span>
           </div>
         </div>
-        <p className="mb-4 text-sm sm:text-base text-[var(--color-secondary)]">
+        <p className="text-sm sm:text-base text-[var(--color-secondary)]">
           We value your privacy and ensure your information is protected.
         </p>
         {/* Error Summary for screen readers */}
         <ErrorSummary errors={errors} />
-        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+        <form
+          onSubmit={handleSubmit(onSubmit, onError)}
+          noValidate
+          className="space-y-4"
+        >
           <FormField
             name="name"
             label="Full Name"
@@ -191,20 +195,18 @@ const ContactForm: React.FC = () => {
             }}
             title="Write your message here"
           />
-          <div className="mb-6 flex flex-col">
-            <div className="flex justify-center">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY as string}
-                className="w-full scale-75 sm:scale-100"
-                style={{ transformOrigin: "0 0" }}
-                onChange={handleRecaptchaChange}
-              />
-            </div>
+          <div className="flex flex-col items-center">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY as string}
+              className="w-full scale-75 sm:scale-100"
+              style={{ transformOrigin: "0 0" }}
+              onChange={handleRecaptchaChange}
+            />
             {errors.recaptcha && (
               <p
                 id="recaptcha-error"
-                className="text-sm text-red-500 mt-2 transition-opacity duration-300"
+                className="mt-2 text-sm text-red-500 transition-opacity duration-300"
                 role="alert"
                 aria-live="assertive"
               >
@@ -212,12 +214,11 @@ const ContactForm: React.FC = () => {
               </p>
             )}
           </div>
-
           <div className="mt-6">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full px-6 py-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
+              className={`w-full px-6 py-4 text-lg rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
                 isSubmitting
                   ? "bg-[var(--color-accent)] bg-opacity-50 cursor-not-allowed"
                   : "bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]"
@@ -233,11 +234,11 @@ const ContactForm: React.FC = () => {
               )}
             </button>
           </div>
-          <p className="mt-2 text-xs sm:text-sm text-[var(--color-secondary)] text-justify">
+          <p className="mt-2 text-xs sm:text-sm text-[var(--color-secondary)] text-center">
             By clicking “Send Your Message”, you agree to our Privacy Policy.
             Your data is secure and will never be shared.
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-[var(--color-secondary)] italic">
+          <p className="mt-1 text-xs sm:text-sm text-[var(--color-secondary)] italic text-center">
             We’ll get back to you promptly.
           </p>
         </form>

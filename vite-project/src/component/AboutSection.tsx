@@ -5,8 +5,6 @@ import aboutImage from "../assets/hero-image.webp";
 /* -------------------------------------------------------
    Custom Hook: useInViewAnimation
    Detects when an element enters the viewport using IntersectionObserver.
-   Falls back gracefully if the browser does not support IntersectionObserver.
-   Returns a ref, a boolean flag indicating visibility, and an announcement for screen readers.
 -------------------------------------------------------- */
 const useInViewAnimation = (threshold = 0.2) => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -15,7 +13,7 @@ const useInViewAnimation = (threshold = 0.2) => {
 
   useEffect(() => {
     if (!ref.current) return;
-    // Fallback if IntersectionObserver is unsupported
+    // Fallback for unsupported browsers.
     if (!("IntersectionObserver" in window)) {
       setInView(true);
       setAnnouncement("About section is now visible.");
@@ -42,20 +40,17 @@ const useInViewAnimation = (threshold = 0.2) => {
 
 /* -------------------------------------------------------
    AboutVisual Component
-   Displays the visual content using a responsive, progressively loaded image.
-   Includes a subtle hover scale effect and optional parallax effect.
+   Displays the visual content with responsive image handling.
 -------------------------------------------------------- */
 const AboutVisual: React.FC = () => {
   return (
-    <div className="md:w-1/2">
+    <div className="w-full md:w-1/2 mb-8 md:mb-0">
       <picture>
-        {/* Low-res image for mobile */}
         <source
           media="(max-width: 640px)"
           srcSet={aboutImage}
           type="image/jpeg"
         />
-        {/* High-res image for desktop */}
         <source
           media="(min-width: 641px)"
           srcSet={aboutImage}
@@ -74,42 +69,50 @@ const AboutVisual: React.FC = () => {
 
 /* -------------------------------------------------------
    AboutNarrative Component
-   Displays the narrative copy, trust signals, and interactive CTA.
-   Includes subtle parallax movement and clear focus styles for keyboard users.
+   Displays the narrative text, testimonial, and interactive CTA.
 -------------------------------------------------------- */
-const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
+interface AboutNarrativeProps {
+  inView: boolean;
+  onCTAClick: () => void;
+}
+const AboutNarrative: React.FC<AboutNarrativeProps> = ({
   inView,
   onCTAClick,
 }) => {
   return (
     <div
-      className="md:w-1/2 md:pl-12 mt-8 md:mt-0 transform transition-transform duration-700 ease-out"
-      style={{ transform: inView ? "translateY(0)" : "translateY(20px)" }}
+      className="w-full md:w-1/2 md:pl-12"
+      style={{
+        transform: inView ? "translateY(0)" : "translateY(10px)",
+        transition: "transform 500ms ease-out",
+      }}
     >
       <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-4">
         About Nutcha Bites
       </h2>
-      <p className="mb-4 text-lg">
+      <p className="mb-4 text-base sm:text-lg text-justify">
         Nestled in the heart of Iloilo, Nutcha Bite celebrates a rich culinary
         heritage by infusing a classic delicacy with an unexpected twist of
-        matcha. Our recipe honors centuries-old traditions while embracing
+        matcha. Our recipe honors centuries‑old traditions while embracing
         modern innovation.
       </p>
-      <p className="mb-4 text-lg">
+      <p className="mb-4 text-base sm:text-lg text-justify">
         Each bite is a journey into the vibrant flavors of Iloilo – where
-        time-honored techniques meet subtle, earthy matcha notes. The result is
+        time‑honored techniques meet subtle, earthy matcha notes. The result is
         a delicacy that captivates both the palate and the imagination.
       </p>
-      <p className="mb-4 text-lg">
+      <p className="mb-4 text-base sm:text-lg text-justify">
         At Nutcha Bite, passion, tradition, and creativity converge to deliver
         an unforgettable taste experience that feels both nostalgic and
         refreshingly contemporary.
       </p>
-      {/* Trust signal: Testimonial snippet */}
       <div className="mb-6 p-4 border-l-4 border-[var(--color-tertiary)] bg-[var(--color-tertiary-10)] bg-opacity-80 rounded shadow-sm">
-        <p className="italic text-[var(--color-secondary)]">
+        <p className="italic text-[var(--color-secondary)] text-justify">
           "Nutcha Bite transports me back to my childhood while introducing me
-          to exciting new flavors. A true masterpiece!" – Satisfied Customer
+          to exciting new flavors. A true masterpiece!"
+        </p>
+        <p className="italic text-[var(--color-secondary)] text-justify">
+          - Satisfied Customer
         </p>
       </div>
       <HashLink
@@ -119,7 +122,7 @@ const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
         title="Explore Our Menu"
         role="button"
         aria-label="Explore Our Menu"
-        className="inline-block mt-4 px-8 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)] hover:bg-opacity-90 transition duration-300 ease-in-out animate-pulse"
+        className="block w-full text-center mt-4 px-6 py-4 bg-[var(--color-accent)] text-[var(--color-primary)] text-lg font-semibold rounded-full focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)] hover:bg-[var(--color-accent)] transition duration-300 ease-in-out"
       >
         Explore Our Menu
       </HashLink>
@@ -129,14 +132,12 @@ const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
 
 /* -------------------------------------------------------
    AboutSection Component
-   Combines the visual and narrative subcomponents.
-   Implements an ARIA live region for dynamic announcements and tracks conversion analytics.
-   Also includes an interactive scroll indicator.
+   Combines visual and narrative subcomponents, includes dynamic announcements and scroll tracking.
 -------------------------------------------------------- */
 const AboutSection: React.FC = () => {
   const { ref, inView, announcement } = useInViewAnimation(0.2);
 
-  // Conversion tracking for CTA click (and potential A/B testing in future)
+  // Conversion tracking for CTA clicks.
   const handleCTAClick = () => {
     if (window.gtag) {
       window.gtag("event", "cta_click", {
@@ -146,7 +147,7 @@ const AboutSection: React.FC = () => {
     }
   };
 
-  // Track scroll depth and time spent in the section for further analytics (example)
+  // Example scroll depth and time spent analytics.
   useEffect(() => {
     let startTime = Date.now();
     const handleScroll = () => {
@@ -173,7 +174,7 @@ const AboutSection: React.FC = () => {
     };
   }, []);
 
-  // Expanded JSON‑LD structured data for SEO
+  // Expanded JSON‑LD structured data for SEO.
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
@@ -208,49 +209,24 @@ const AboutSection: React.FC = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-
       {/* ARIA Live Region for dynamic announcements */}
       <div aria-live="polite" className="sr-only">
         {announcement}
       </div>
-
       <section
         id="about"
         ref={ref}
-        className={`bg-[var(--color-primary)] text-[var(--color-secondary)] py-16 transition-all duration-700 ease-out ${
+        className={`bg-[var(--color-primary)] text-[var(--color-secondary)] py-16 px-4 sm:px-6 md:px-8 transition-all duration-700 ease-out ${
           inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
         role="region"
         aria-label="About Nutcha Bite"
       >
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div className="container mx-auto flex flex-col md:flex-row items-center">
           <AboutVisual />
-          <AboutNarrative inView={inView} onCTAClick={handleCTAClick} />
-        </div>
-        {/* Interactive Scroll Indicator */}
-        <div className="mt-12 flex justify-center">
-          <HashLink
-            smooth
-            to="#menu"
-            title="Scroll Down"
-            className="animate-bounce text-[var(--color-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-tertiary)]"
-            aria-label="Scroll Down to Menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </HashLink>
+          <div className="md:ml-12">
+            <AboutNarrative inView={inView} onCTAClick={handleCTAClick} />
+          </div>
         </div>
       </section>
     </>

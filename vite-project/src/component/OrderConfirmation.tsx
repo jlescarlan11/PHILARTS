@@ -5,7 +5,6 @@ import autoTable from "jspdf-autotable";
 
 // -------------------------
 // TrackingModal Component
-// Displays dynamic tracking details and now accepts a trackingNumber prop.
 // -------------------------
 interface TrackingModalProps {
   onClose: () => void;
@@ -29,21 +28,26 @@ const TrackingModal: React.FC<TrackingModalProps> = ({
         onClick={onClose}
         aria-hidden="true"
       ></div>
-      <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
+      <div className="relative bg-[var(--color-primary)] p-6 md:p-8 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
         <h3
           id="tracking-modal-title"
-          className="text-2xl font-bold text-gray-800"
+          className="text-2xl md:text-3xl font-bold text-[var(--color-secondary)]"
         >
           Track Your Order
         </h3>
-        <p id="tracking-modal-description" className="mt-2 text-gray-600">
+        <p
+          id="tracking-modal-description"
+          className="mt-2 text-base md:text-lg text-[var(--color-secondary)]"
+        >
           Tracking Number: <span className="font-bold">{trackingNumber}</span>
         </p>
-        <p className="mt-2 text-gray-600">Current Status: {currentStatus}</p>
+        <p className="mt-2 text-base md:text-lg text-[var(--color-secondary)]">
+          Current Status: {currentStatus}
+        </p>
         <div className="mt-4 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full sm:w-auto px-5 py-2 bg-[var(--color-accent)] text-white rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Close tracking modal"
           >
             Close
@@ -56,7 +60,7 @@ const TrackingModal: React.FC<TrackingModalProps> = ({
 
 // -------------------------
 // OrderConfirmationModal Component
-// Displays a confirmation message upon final order placement.
+// -------------------------
 interface OrderConfirmationModalProps {
   onConfirm: () => void;
   onClose: () => void;
@@ -77,24 +81,24 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
       onClick={onClose}
       aria-hidden="true"
     ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
+    <div className="relative bg-[var(--color-primary)] p-6 md:p-8 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
       <h3
         id="order-confirmation-modal-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
+        className="text-2xl md:text-3xl font-bold text-[var(--color-secondary)]"
       >
         Order Placed Successfully!
       </h3>
       <p
         id="order-confirmation-modal-description"
-        className="mt-2 text-[var(--color-secondary)]"
+        className="mt-2 text-base md:text-lg text-[var(--color-secondary)]"
       >
         Thank you for your order. Your cart has been cleared.
       </p>
       <div className="mt-4 flex justify-end">
         <button
           onClick={onConfirm}
-          className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
-          aria-label="Close confirmation"
+          className="w-full sm:w-auto px-5 py-2 bg-[var(--color-accent)] text-white rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          aria-label="Confirm order"
         >
           OK
         </button>
@@ -105,121 +109,83 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
 
 // -------------------------
 // OrderConfirmation Component
-// Displays a comprehensive summary of the completed order with enhanced visual design and interactivity.
 // -------------------------
+interface OrderItem {
+  id: string;
+  name: string;
+  size?: string;
+  quantity: number;
+  price: number;
+}
+
+interface OrderDetails {
+  orderNumber: number;
+  items: OrderItem[];
+  billing: {
+    fullName: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  shipping: {
+    fullName: string;
+    address: string;
+    city: string;
+    postalCode: string;
+  };
+  pricing: {
+    subtotal: number;
+    tax: number;
+    shippingCost: number;
+    discount: number;
+    discountAmount: number;
+    total: number;
+  };
+  estimatedDelivery: string;
+}
+
 const OrderConfirmation: React.FC = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [showTrackingModal, setShowTrackingModal] = useState<boolean>(false);
   const [showConfirmationModal, setShowConfirmationModal] =
     useState<boolean>(false);
-  // New state to store a consistent tracking number.
   const [trackingNumber, setTrackingNumber] = useState<string>("");
 
-  // Retrieve order details from localStorage on mount.
   useEffect(() => {
     const cachedOrder = localStorage.getItem("orderDetails");
     if (cachedOrder) {
       const parsedOrder = JSON.parse(cachedOrder) as OrderDetails;
       setOrder(parsedOrder);
-      // Generate and store a consistent tracking number.
       setTrackingNumber("TRK" + Math.floor(100000 + Math.random() * 900000));
     }
   }, []);
 
-  // Handler for "Continue Shopping".
   const handleContinueShopping = () => {
     localStorage.removeItem("orderDetails");
     navigate("/");
   };
 
-  // Handler for printing receipt.
-
-  // Define types for order details (assumed to be imported or declared elsewhere)
-  interface OrderItem {
-    id: string;
-    name: string;
-    size?: string;
-    quantity: number;
-    price: number;
-  }
-
-  interface OrderDetails {
-    orderNumber: number;
-    items: OrderItem[];
-    billing: {
-      fullName: string;
-      email: string;
-      phone: string;
-      address: string;
-    };
-    shipping: {
-      fullName: string;
-      address: string;
-      city: string;
-      postalCode: string;
-    };
-    pricing: {
-      subtotal: number;
-      tax: number;
-      shippingCost: number;
-      discount: number;
-      discountAmount: number;
-      total: number;
-    };
-    estimatedDelivery: string;
-  }
-
-  /**
-   * generateInvoicePDF - Enhanced invoice generation function using jsPDF.
-   *
-   * This function accepts an order object (of type OrderDetails) and an optional flag
-   * (printInsteadOfDownload) to either download the invoice as a PDF or trigger printing.
-   *
-   * Key Features:
-   * - Uses jsPDF and the autoTable plugin to create a well-formatted invoice.
-   * - Organizes the invoice into clearly defined sections with headers and dividers.
-   * - Applies custom font sizes, colors, and draws lines for visual separation.
-   * - Includes a header with the company name/logo.
-   * - Constructs a dynamic filename based on the order number.
-   * - Provides robust error handling.
-   *
-   * @param order - The order details to include in the invoice.
-   * @param printInsteadOfDownload - (Optional) If true, triggers print; otherwise, downloads the PDF.
-   */
-  /**
-   * generateInvoicePDF - Generates and downloads or prints a PDF invoice.
-   *
-   * @param order - The order details to include in the invoice.
-   * @param printInsteadOfDownload - If true, triggers print; otherwise, downloads the PDF.
-   */
   const handleDownloadReceipt = (
     order: OrderDetails,
     printInsteadOfDownload: boolean = false
   ): void => {
     try {
-      // Check if order exists
       if (!order) {
         throw new Error("Order details are missing.");
       }
-
-      // Create a new jsPDF document.
       const doc = new jsPDF();
 
-      // -------------------------
       // Header Section
-      // -------------------------
       doc.setFontSize(22);
       doc.setTextColor(40);
       doc.text("Nutcha Bite", 105, 20, { align: "center" });
       doc.setFontSize(12);
       doc.text("Receipt", 105, 28, { align: "center" });
       doc.setLineWidth(0.5);
-      doc.line(20, 32, 190, 32); // Draw divider
+      doc.line(20, 32, 190, 32);
 
-      // -------------------------
       // Order Details Section
-      // -------------------------
       doc.setFontSize(14);
       doc.text("Order Number:", 20, 42);
       doc.setFontSize(12);
@@ -229,9 +195,7 @@ const OrderConfirmation: React.FC = () => {
       doc.setFontSize(12);
       doc.text(`${order.estimatedDelivery}`, 80, 50);
 
-      // -------------------------
       // Purchased Items Section using autoTable for layout.
-      // -------------------------
       const itemRows = order.items.map((item) => [
         `${item.name}${item.size ? " (" + item.size + ")" : ""}`,
         String(item.quantity),
@@ -246,13 +210,9 @@ const OrderConfirmation: React.FC = () => {
         styles: { fontSize: 10 },
         margin: { left: 20, right: 20 },
       });
-
-      // Retrieve final Y position after the table.
       const finalY = (doc as any).lastAutoTable.finalY || 70;
 
-      // -------------------------
       // Billing Information Section
-      // -------------------------
       doc.setFontSize(14);
       doc.text("Billing Information:", 20, finalY + 10);
       doc.setFontSize(12);
@@ -260,11 +220,9 @@ const OrderConfirmation: React.FC = () => {
       doc.text(`Email: ${order.billing.email}`, 20, finalY + 26);
       doc.text(`Phone: ${order.billing.phone}`, 20, finalY + 34);
       doc.text(`Address: ${order.billing.address}`, 20, finalY + 42);
-      doc.line(20, finalY + 46, 190, finalY + 46); // Divider
+      doc.line(20, finalY + 46, 190, finalY + 46);
 
-      // -------------------------
       // Shipping Information Section
-      // -------------------------
       doc.setFontSize(14);
       doc.text("Shipping Information:", 20, finalY + 56);
       doc.setFontSize(12);
@@ -274,11 +232,9 @@ const OrderConfirmation: React.FC = () => {
         20,
         finalY + 72
       );
-      doc.line(20, finalY + 76, 190, finalY + 76); // Divider
+      doc.line(20, finalY + 76, 190, finalY + 76);
 
-      // -------------------------
       // Pricing Summary Section
-      // -------------------------
       doc.setFontSize(14);
       doc.text("Pricing Summary:", 20, finalY + 86);
       doc.setFontSize(12);
@@ -301,24 +257,18 @@ const OrderConfirmation: React.FC = () => {
         );
       }
       doc.text(`Total: $${order.pricing.total.toFixed(2)}`, 20, finalY + 126);
-      doc.line(20, finalY + 130, 190, finalY + 130); // Final divider
+      doc.line(20, finalY + 130, 190, finalY + 130);
 
-      // -------------------------
       // Footer / Thank You Note
-      // -------------------------
       doc.setFontSize(12);
       doc.text("Thank you for your purchase!", 20, finalY + 138);
 
-      // -------------------------
       // Save or Print the PDF
-      // -------------------------
       const filename = `Receipt_Order_${order.orderNumber}.pdf`;
       if (printInsteadOfDownload) {
-        // If printing is desired, open the print dialog.
         doc.autoPrint();
         window.open(doc.output("bloburl"), "_blank");
       } else {
-        // Download the PDF file.
         doc.save(filename);
       }
     } catch (error) {
@@ -327,21 +277,17 @@ const OrderConfirmation: React.FC = () => {
     }
   };
 
-  // Handler for finalizing the order.
-
-  // When confirmation modal is confirmed, clear the cart and navigate.
   const handleConfirmation = () => {
     localStorage.removeItem("orderDetails");
     setShowConfirmationModal(false);
-    navigate("/order-confirmation"); // Or display a final thank-you message.
+    navigate("/order-confirmation");
   };
 
-  // Fallback UI if order details are missing.
   if (!order) {
     return (
       <div className="bg-[var(--color-primary)] min-h-screen flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-[var(--color-secondary)]">
-          <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-4">
+        <div className="bg-[var(--color-primary)] p-8 rounded-lg shadow-lg text-[var(--color-secondary)]">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             No Order Found
           </h2>
           <p className="mb-4">
@@ -349,7 +295,7 @@ const OrderConfirmation: React.FC = () => {
           </p>
           <button
             onClick={handleContinueShopping}
-            className="px-6 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300"
+            className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Continue shopping"
           >
             Continue Shopping
@@ -360,64 +306,62 @@ const OrderConfirmation: React.FC = () => {
   }
 
   return (
-    <main className="bg-[var(--color-primary)] min-h-screen p-6">
+    <main className="bg-[var(--color-primary)] min-h-screen p-4 md:p-6 lg:p-8">
       {/* Print-specific styles */}
-      <style>
-        {`
-          @media print {
-            .no-print {
-              display: none !important;
-            }
-            body {
-              -webkit-print-color-adjust: exact;
-            }
+      <style>{`
+        @media print {
+          .no-print {
+            display: none !important;
           }
-        `}
-      </style>
-      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        {/* Header with secure visual cues */}
-        <header className="flex items-center mb-6">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8 text-green-600 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11s1.343 3 3 3 3-1.343 3-3zM18 11c0-1.657-1.343-3-3-3s-3 1.343-3 3 1.343 3 3 3 3-1.343 3-3z"
-            />
-          </svg>
-          <h1 className="text-3xl font-bold text-[var(--color-secondary)]">
-            Order Confirmation
-          </h1>
+          body {
+            -webkit-print-color-adjust: exact;
+          }
+        }
+      `}</style>
+      <div className="max-w-5xl mx-auto bg-[var(--color-primary)] rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+        <header className="flex flex-col md:flex-row items-center mb-6">
+          <div className="flex items-center mb-4 md:mb-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8 mr-2 text-[var(--color-secondary)]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11s1.343 3 3 3 3-1.343 3-3zM18 11c0-1.657-1.343-3-3-3s-3 1.343-3 3 1.343 3 3 3 3-1.343 3-3z"
+              />
+            </svg>
+            <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-secondary)]">
+              Order Confirmation
+            </h1>
+          </div>
         </header>
-        <p className="text-lg mb-4 text-[var(--color-secondary)]">
+        <p className="text-lg md:text-xl mb-6 text-[var(--color-secondary)]">
           Your order has been placed successfully!
         </p>
-        {/* Completed Order Details */}
-        <section aria-label="Completed Order Details" className="space-y-6">
-          {/* Order Number */}
-          <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h3 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+        <section className="space-y-4">
+          <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
+            <h3 className="text-xl font-bold mb-2 text-[var(--color-secondary)]">
               Order Number
             </h3>
-            <p className="text-lg">{order.orderNumber}</p>
+            <p className="text-lg text-[var(--color-secondary)]">
+              {order.orderNumber}
+            </p>
           </div>
-          {/* Purchased Items */}
-          <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+          <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
+            <h2 className="text-xl font-bold mb-2 text-[var(--color-secondary)]">
               Purchased Items
             </h2>
-            <ul className="list-disc pl-6">
+            <ul className="list-disc pl-6 text-[var(--color-secondary)]">
               {order.items.map((item) => (
                 <li
                   key={`${item.id}-${item.size || "default"}`}
-                  className="text-sm text-[var(--color-secondary)]"
+                  className="text-sm"
                 >
                   {item.name} {item.size && `(${item.size})`} – Qty:{" "}
                   {item.quantity} – ${item.price.toFixed(2)} each
@@ -425,9 +369,8 @@ const OrderConfirmation: React.FC = () => {
               ))}
             </ul>
           </div>
-          {/* Billing Information */}
-          <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+          <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
+            <h2 className="text-xl font-bold mb-2 text-[var(--color-secondary)]">
               Billing Information
             </h2>
             <p className="text-sm text-[var(--color-secondary)]">
@@ -443,9 +386,8 @@ const OrderConfirmation: React.FC = () => {
               Address: {order.billing.address}
             </p>
           </div>
-          {/* Shipping Information */}
-          <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+          <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
+            <h2 className="text-xl font-bold mb-2 text-[var(--color-secondary)]">
               Shipping Information
             </h2>
             <p className="text-sm text-[var(--color-secondary)]">
@@ -456,9 +398,8 @@ const OrderConfirmation: React.FC = () => {
               {order.shipping.postalCode}
             </p>
           </div>
-          {/* Pricing Summary */}
-          <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+          <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
+            <h2 className="text-xl font-bold mb-2 text-[var(--color-secondary)]">
               Pricing Summary
             </h2>
             <p className="text-sm text-[var(--color-secondary)]">
@@ -479,9 +420,8 @@ const OrderConfirmation: React.FC = () => {
               Total: ${order.pricing.total.toFixed(2)}
             </p>
           </div>
-          {/* Estimated Delivery Date */}
-          <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+          <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
+            <h2 className="text-xl font-bold mb-2 text-[var(--color-secondary)]">
               Estimated Delivery Date
             </h2>
             <p className="text-sm text-[var(--color-secondary)]">
@@ -489,26 +429,24 @@ const OrderConfirmation: React.FC = () => {
             </p>
           </div>
         </section>
-
-        {/* Conversion-Focused Call-to-Action Buttons */}
         <section className="flex flex-col sm:flex-row sm:justify-between mt-6 space-y-4 sm:space-y-0">
           <button
             onClick={() => setShowTrackingModal(true)}
-            className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
+            className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Track Order"
           >
             Track Order
           </button>
           <button
             onClick={() => handleDownloadReceipt(order, false)}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition duration-300"
+            className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Print Receipt"
           >
             Print Receipt
           </button>
           <button
             onClick={handleContinueShopping}
-            className="px-6 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300"
+            className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Continue Shopping"
           >
             Continue Shopping
@@ -516,35 +454,19 @@ const OrderConfirmation: React.FC = () => {
         </section>
       </div>
 
-      {/* Tracking Modal with consistent tracking number */}
+      {/* Modals */}
       {showTrackingModal && (
         <TrackingModal
           trackingNumber={trackingNumber}
           onClose={() => setShowTrackingModal(false)}
         />
       )}
-
-      {/* Order Confirmation Modal (optional, if final confirmation needed) */}
       {showConfirmationModal && (
         <OrderConfirmationModal
           onConfirm={handleConfirmation}
           onClose={() => setShowConfirmationModal(false)}
         />
       )}
-
-      {/* Print-specific styles */}
-      <style>
-        {`
-          @media print {
-            .no-print {
-              display: none !important;
-            }
-            body {
-              -webkit-print-color-adjust: exact;
-            }
-          }
-        `}
-      </style>
     </main>
   );
 };

@@ -48,7 +48,9 @@ const FormField: React.FC<FormFieldProps> = ({
     placeholder,
     title, // Pass title to input for inline hint.
     className: `mt-1 block w-full p-2 border ${
-      error ? "border-red-500" : "border-gray-300"
+      error
+        ? "border-red-500"
+        : "text-[var(--color-secondary)] border-[var(--color-secondary-50)]"
     } rounded focus:outline-none focus:ring-2 focus:ring-accent transition-colors duration-300`,
     "aria-invalid": !!error,
     "aria-describedby": `${name}-error`,
@@ -58,11 +60,8 @@ const FormField: React.FC<FormFieldProps> = ({
   };
 
   return (
-    <div className="mb-6 relative transition-all duration-300 group">
-      <label
-        htmlFor={name}
-        className="block text-sm font-medium text-secondary"
-      >
+    <div className="mb-6 relative transition-all text-[var(--color-secondary)] duration-300 group">
+      <label htmlFor={name} className="block text-sm font-medium">
         {label}
       </label>
       {isTextArea ? (

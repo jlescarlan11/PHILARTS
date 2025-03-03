@@ -231,7 +231,7 @@ const BackToTop: React.FC = () => {
           className="fixed bottom-6 right-6 bg-[var(--color-accent)] text-[var(--color-primary)] px-3 py-3 rounded-full shadow-lg hover:bg-opacity-80 focus:outline-none focus:ring-2 transition-all duration-300"
           aria-label="Back to top"
         >
-          <MdArrowUpward size={24} />
+          <MdArrowUpward className="size-4" />
         </button>
       )}
     </>

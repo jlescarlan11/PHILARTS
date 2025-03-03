@@ -253,13 +253,13 @@ const FAQSearchBox: React.FC<FAQSearchBoxProps> = ({ query, setQuery }) => (
       value={query}
       onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
       placeholder="Search FAQs..."
-      className="flex-grow p-2 sm:p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-sm sm:text-base"
+      className="flex-grow p-2 sm:p-3 border border-[var(--color-secondary-50)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-sm sm:text-base"
       aria-label="Search FAQs"
     />
     {query && (
       <button
         onClick={() => setQuery("")}
-        className="ml-2 px-3 py-2 sm:px-4 sm:py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+        className="ml-2 px-3 py-2 sm:px-4 sm:py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-[var(--color-accent-90)] transition duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
         aria-label="Clear search"
       >
         Clear

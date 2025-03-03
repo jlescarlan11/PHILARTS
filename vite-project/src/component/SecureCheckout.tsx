@@ -143,14 +143,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <div className="mt-4 flex justify-end space-x-2">
         <button
           onClick={onCancel}
-          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-primary)] border border-[var(--color-secondary)] text-[var(--color-secondary)] rounded hover:bg-gray-200 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-primary)] border border-[var(--color-secondary)] text-[var(--color-primary)] rounded hover:bg-[var(--color-secondary)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label="Cancel"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
-          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           aria-label="Confirm order"
         >
           OK
@@ -230,8 +230,9 @@ const BillingForm: React.FC<{
       value={billing.fullName}
       onChange={(e) => setBilling({ ...billing, fullName: e.target.value })}
       ref={firstInputRef}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border text-[var(--color-secondary)] border-[var(--color-secondary-50)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
+      placeholder="Enter Full Name"
       aria-describedby="billing-fullname-error"
     />
     {errors.fullName && (
@@ -253,7 +254,8 @@ const BillingForm: React.FC<{
       type="email"
       value={billing.email}
       onChange={(e) => setBilling({ ...billing, email: e.target.value })}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3  border text-[var(--color-secondary)] border-[var(--color-secondary-50)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter Email Address"
       required
     />
     {errors.email && (
@@ -270,7 +272,8 @@ const BillingForm: React.FC<{
       type="tel"
       value={billing.phone}
       onChange={(e) => setBilling({ ...billing, phone: e.target.value })}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border text-[var(--color-secondary)] border-[var(--color-secondary-50)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter Phone Number"
       required
     />
     {errors.phone && (
@@ -287,7 +290,8 @@ const BillingForm: React.FC<{
       type="text"
       value={billing.address}
       onChange={(e) => setBilling({ ...billing, address: e.target.value })}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border text-[var(--color-secondary)] border-[var(--color-secondary-50)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter Address"
       required
     />
     {errors.address && (
@@ -321,7 +325,8 @@ const ShippingForm: React.FC<{
       value={shipping.fullName}
       onChange={(e) => setShipping({ ...shipping, fullName: e.target.value })}
       ref={firstInputRef}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter Full Name"
       required
     />
     {errors.shippingFullName && (
@@ -340,7 +345,8 @@ const ShippingForm: React.FC<{
       type="text"
       value={shipping.address}
       onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter Shipping Address"
       required
     />
     {errors.shippingAddress && (
@@ -359,7 +365,8 @@ const ShippingForm: React.FC<{
       type="text"
       value={shipping.city}
       onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
-      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter City"
       required
     />
     {errors.city && (
@@ -377,7 +384,8 @@ const ShippingForm: React.FC<{
       value={formatPostalCode(shipping.postalCode)}
       onChange={(e) => setShipping({ ...shipping, postalCode: e.target.value })}
       maxLength={4}
-      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-1 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      placeholder="Enter Postal Code"
       required
       aria-describedby="postal-code-guide"
     />
@@ -437,7 +445,7 @@ const PaymentForm: React.FC<{
       onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
       ref={firstInputRef}
       maxLength={19}
-      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-1 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="card-number-guide"
     />
@@ -465,7 +473,7 @@ const PaymentForm: React.FC<{
         setPayment({ ...payment, expiryDate: formatExpiryDate(e.target.value) })
       }
       maxLength={5}
-      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-1 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="expiry-date-guide"
     />
@@ -495,7 +503,7 @@ const PaymentForm: React.FC<{
       maxLength={4}
       inputMode="numeric"
       pattern="\d{3,4}"
-      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-1 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="cvv-guide"
     />
@@ -520,7 +528,7 @@ const PaymentForm: React.FC<{
       placeholder="Name on Card"
       value={payment.cardName}
       onChange={(e) => setPayment({ ...payment, cardName: e.target.value })}
-      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-1 border border-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="card-name-guide"
     />
@@ -730,7 +738,7 @@ const SecureCheckout: React.FC = () => {
               className={`flex-1 text-center py-2 mb-2 sm:mb-0 border-b-4 ${
                 step === index + 1
                   ? "border-[var(--color-accent)] text-[var(--color-accent)] font-bold"
-                  : "border-gray-300 text-[var(--color-secondary)]"
+                  : "border-[var(--color-accent-30)] text-[var(--color-accent-30)]"
               }`}
               aria-label={`Step ${index + 1}: ${label}`}
             >
@@ -768,7 +776,7 @@ const SecureCheckout: React.FC = () => {
             <div className="flex-1">
               {/* Completed Order Details */}
               <div className="bg-[var(--color-primary)] p-4 sm:p-6 rounded-lg shadow mb-6">
-                <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4">
+                <h2 className="text-3xl sm:text-4xl font-semibold text-[var(--color-secondary)] mb-4">
                   Completed Order Details
                 </h2>
                 <p className="mb-2 text-[var(--color-secondary)]">
@@ -835,35 +843,37 @@ const SecureCheckout: React.FC = () => {
               </div>
             </div>
             {/* Order Summary Sidebar */}
-            <div className="w-full lg:w-1/3 bg-[var(--color-primary)] rounded-lg shadow p-4 sm:p-6 sticky top-6">
-              <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-[var(--color-secondary)]">
-                Order Summary
-              </h3>
-              <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
-                Subtotal: ${subtotal.toFixed(2)}
-              </p>
-              <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
-                Tax (10%): ${tax.toFixed(2)}
-              </p>
-              <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
-                Shipping: ${shippingCost.toFixed(2)}
-              </p>
-              {discount > 0 && (
-                <p className="text-lg sm:text-xl text-[var(--color-accent)]">
-                  Discount: -${discountAmount.toFixed(2)}
+            {step !== 4 && (
+              <div className="w-full lg:w-1/3 bg-[var(--color-primary)] rounded-lg shadow p-4 sm:p-6 sticky top-6">
+                <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-[var(--color-secondary)]">
+                  Order Summary
+                </h3>
+                <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
+                  Subtotal: ${subtotal.toFixed(2)}
                 </p>
-              )}
-              <p className="text-2xl sm:text-3xl font-bold mt-4 text-[var(--color-secondary)]">
-                Total: ${total.toFixed(2)}
-              </p>
-              <button
-                onClick={() => setShowConfirmModal(true)}
-                className="mt-4 w-full px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                aria-label="Clear cart"
-              >
-                Clear Cart
-              </button>
-            </div>
+                <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
+                  Tax (10%): ${tax.toFixed(2)}
+                </p>
+                <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
+                  Shipping: ${shippingCost.toFixed(2)}
+                </p>
+                {discount > 0 && (
+                  <p className="text-lg sm:text-xl text-[var(--color-accent)]">
+                    Discount: -${discountAmount.toFixed(2)}
+                  </p>
+                )}
+                <p className="text-2xl sm:text-3xl font-bold mt-4 text-[var(--color-secondary)]">
+                  Total: ${total.toFixed(2)}
+                </p>
+                <button
+                  onClick={() => setShowConfirmModal(true)}
+                  className="mt-4 w-full px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                  aria-label="Clear cart"
+                >
+                  Clear Cart
+                </button>
+              </div>
+            )}
           </div>
         )}
         {/* Navigation Buttons */}
@@ -881,7 +891,7 @@ const SecureCheckout: React.FC = () => {
             <button
               onClick={handleNext}
               disabled={processing}
-              className={`ml-auto px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
+              className={`ml-auto px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
                 processing ? "opacity-50 cursor-not-allowed" : ""
               }`}
               aria-label="Continue to next step"
@@ -889,7 +899,7 @@ const SecureCheckout: React.FC = () => {
               {processing ? (
                 <span className="flex items-center">
                   <svg
-                    className="animate-spin h-5 w-5 mr-2 text-[var(--color-secondary)]"
+                    className="animate-spin h-5 w-5 mr-2 text-[var(--color-[var(--color-primary)])]"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -918,7 +928,7 @@ const SecureCheckout: React.FC = () => {
           {step === 4 && (
             <button
               onClick={handlePlaceOrder}
-              className="ml-auto px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              className="ml-auto px-4 py-3 sm:px-6 sm:py-3 w-full sm:w-fit bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
               aria-label="Place order"
             >
               Place Order

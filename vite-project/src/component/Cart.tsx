@@ -475,7 +475,7 @@ const Cart: React.FC = () => {
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
               placeholder="Coupon Code"
-              className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] flex-1 text-[var(--color-secondary)]"
+              className="p-2 border border-[var(--color-secondary-50)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] flex-1 text-[var(--color-secondary)]"
               aria-label="Enter coupon code"
             />
             <button
