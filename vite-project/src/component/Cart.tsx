@@ -263,7 +263,9 @@ const Cart: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Left Column: Cart Items */}
       <div>
-        <h2 className="text-3xl font-bold mb-6">Your Cart</h2>
+        <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-6">
+          Your Cart
+        </h2>
         {groupedItems.length === 0 ? (
           <>
             <p>Your cart is empty.</p>

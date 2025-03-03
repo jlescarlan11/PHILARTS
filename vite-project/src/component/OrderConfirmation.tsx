@@ -341,7 +341,9 @@ const OrderConfirmation: React.FC = () => {
     return (
       <div className="bg-[var(--color-primary)] min-h-screen flex items-center justify-center p-6">
         <div className="bg-white p-8 rounded-lg shadow-lg text-[var(--color-secondary)]">
-          <h2 className="text-2xl font-bold mb-4">No Order Found</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-4">
+            No Order Found
+          </h2>
           <p className="mb-4">
             We couldn’t retrieve your order details. Please continue shopping.
           </p>
@@ -401,9 +403,9 @@ const OrderConfirmation: React.FC = () => {
         <section aria-label="Completed Order Details" className="space-y-6">
           {/* Order Number */}
           <div className="bg-gradient-to-b from-white/80 to-gray-200 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
+            <h3 className="text-xl font-bold text-[var(--color-secondary)] mb-2">
               Order Number
-            </h2>
+            </h3>
             <p className="text-lg">{order.orderNumber}</p>
           </div>
           {/* Purchased Items */}

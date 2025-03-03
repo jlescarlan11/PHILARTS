@@ -13,10 +13,7 @@ import { MdArrowUpward } from "react-icons/md";
 // -------------------------
 const BrandInfo: React.FC = () => (
   <div className="text-center md:text-left">
-    <h2
-      className="text-2xl font-bold"
-      style={{ color: "var(--color-secondary)" }}
-    >
+    <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)]">
       Nutcha Bite
     </h2>
     <p className="mt-2 text-sm" style={{ color: "var(--color-secondary)" }}>
@@ -200,11 +197,10 @@ const TrustSignals: React.FC = () => (
   <div className="mt-4 flex flex-col items-center justify-center">
     <div className="flex items-center space-x-2 justify-center">
       <FaShieldAlt
-        size={20}
+        className="size-4 text-[var(--color-accent-70)]"
         aria-hidden="true"
-        style={{ color: "var(--color-accent)" }}
       />
-      <span className="text-xs" style={{ color: "var(--color-secondary)" }}>
+      <span className="text-xs" style={{ color: "var(--color-secondary-70)" }}>
         Secure transactions &amp; trusted by thousands
       </span>
     </div>

@@ -199,7 +199,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
         </svg>
       ))}
     </div>
-    <p className="text-center text-xl text-[var(--color-secondary)] italic mb-2">
+    <p className="py-2 pl-2 sm:pl-4 text-base sm:text-lg text-center text-[var(--color-secondary)] italic mb-2">
       {testimonial.review.length > 100
         ? testimonial.review.slice(0, 100) + "..."
         : testimonial.review}
@@ -225,7 +225,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     {testimonial.review.length > 100 && (
       <button
         onClick={() => onReadMore(testimonial)}
-        className="mt-2 underline text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+        className="my-2 underline  text-xs text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
         aria-label={`Read full testimonial from ${testimonial.name}`}
       >
         Read More
@@ -549,7 +549,7 @@ const TestimonialsSection: React.FC = () => {
         {announcement}
       </div>
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center text-[var(--color-secondary)] mb-8">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8">
           What Our Customers Say
         </h2>
         {/* Slider Container */}

@@ -664,7 +664,7 @@ const ProductShowcase: React.FC = () => {
     <section id="products" className="relative py-16 bg-[var(--color-primary)]">
       {/* <MiniCartBadge cartCount={cartCount} /> */}
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-8 text-[var(--color-secondary)]">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] text-center mb-8">
           Our Delicious Selections
         </h2>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">

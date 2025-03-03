@@ -86,7 +86,9 @@ const AboutNarrative: React.FC<{ inView: boolean; onCTAClick: () => void }> = ({
       className="md:w-1/2 md:pl-12 mt-8 md:mt-0 transform transition-transform duration-700 ease-out"
       style={{ transform: inView ? "translateY(0)" : "translateY(20px)" }}
     >
-      <h2 className="text-4xl font-bold mb-4">About Nutcha Bite</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] mb-4">
+        About Nutcha Bites
+      </h2>
       <p className="mb-4 text-lg">
         Nestled in the heart of Iloilo, Nutcha Bite celebrates a rich culinary
         heritage by infusing a classic delicacy with an unexpected twist of
