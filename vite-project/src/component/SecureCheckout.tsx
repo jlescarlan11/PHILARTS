@@ -30,7 +30,7 @@ export interface PaymentDetails {
 
 // -------------------------
 // Input Formatting Helpers
-// These functions help format inputs as the user types.
+// -------------------------
 const formatCardNumber = (value: string): string => {
   const cleaned = value.replace(/\D/g, "").substring(0, 16);
   let formatted = "";
@@ -47,15 +47,22 @@ const formatExpiryDate = (value: string): string => {
   return `${cleaned.substring(0, 2)}/${cleaned.substring(2)}`;
 };
 
-const formatCVV = (value: string): string =>
-  value.replace(/\D/g, "").substring(0, 4);
+const formatCVV = (value: string): string => {
+  const cleaned = value.replace(/\D/g, "").substring(0, 4);
+  let formatted = "";
+  for (let i = 0; i < cleaned.length; i++) {
+    if (i > 0 && i % 1 === 0) formatted += "";
+    formatted += cleaned[i];
+  }
+  return formatted;
+};
 
 const formatPostalCode = (value: string): string =>
   value.replace(/\D/g, "").substring(0, 4);
 
 // -------------------------
 // Analytics Tracker Utility
-// Logs interaction events.
+// -------------------------
 const trackEvent = (eventName: string, details: Record<string, any>) => {
   try {
     if (window.gtag) {
@@ -70,7 +77,7 @@ const trackEvent = (eventName: string, details: Record<string, any>) => {
 
 // -------------------------
 // Helper: groupCartItems
-// Groups duplicate cart items (by name, price, and size) by summing their quantities.
+// -------------------------
 const groupCartItems = (items: CartItem[]): CartItem[] => {
   const grouped: Record<string, CartItem> = {};
   items.forEach((item) => {
@@ -86,16 +93,16 @@ const groupCartItems = (items: CartItem[]): CartItem[] => {
 
 // -------------------------
 // Toast Component
-// Displays temporary toast notifications.
+// -------------------------
 const Toast: React.FC<{ message: string }> = ({ message }) => (
-  <div className="fixed bottom-4 right-4 bg-[var(--color-accent)] text-white px-4 py-2 rounded shadow-md animate-fadeIn">
+  <div className="fixed bottom-4 right-4 bg-[var(--color-accent)] text-[var(--color-secondary)] px-4 py-3 rounded shadow-md animate-fadeIn text-sm sm:text-base">
     {message}
   </div>
 );
 
 // -------------------------
 // ConfirmModal Component
-// Reusable modal for confirming actions.
+// -------------------------
 interface ConfirmModalProps {
   name: string;
   message: string;
@@ -120,10 +127,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       onClick={onCancel}
       aria-hidden="true"
     ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
+    <div className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
       <h3
         id="confirm-modal-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
+        className="text-2xl sm:text-3xl font-bold text-[var(--color-secondary)]"
       >
         {name}
       </h3>
@@ -136,14 +143,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <div className="mt-4 flex justify-end space-x-2">
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-primary)] border border-[var(--color-secondary)] text-[var(--color-secondary)] rounded hover:bg-gray-200 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label="Cancel"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           aria-label="Confirm order"
         >
           OK
@@ -155,7 +162,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
 // -------------------------
 // OrderConfirmationModal Component
-// Displays order confirmation details and clears the cart.
+// -------------------------
 const OrderConfirmationModal: React.FC<{
   onConfirm: () => void;
   onClose: () => void;
@@ -172,10 +179,10 @@ const OrderConfirmationModal: React.FC<{
       onClick={onClose}
       aria-hidden="true"
     ></div>
-    <div className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
+    <div className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300">
       <h3
         id="order-confirmation-title"
-        className="text-2xl font-bold text-[var(--color-secondary)]"
+        className="text-2xl sm:text-3xl font-bold text-[var(--color-secondary)]"
       >
         Order Placed Successfully!
       </h3>
@@ -188,7 +195,7 @@ const OrderConfirmationModal: React.FC<{
       <div className="mt-4 flex justify-end">
         <button
           onClick={onConfirm}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           aria-label="Close confirmation"
         >
           OK
@@ -200,20 +207,20 @@ const OrderConfirmationModal: React.FC<{
 
 // -------------------------
 // BillingForm Component
-// Renders the Billing Details step with explicit labels and persistent guidance.
+// -------------------------
 const BillingForm: React.FC<{
   billing: BillingDetails;
   setBilling: React.Dispatch<React.SetStateAction<BillingDetails>>;
   errors: Record<string, string>;
   firstInputRef: React.RefObject<HTMLInputElement | null>;
 }> = ({ billing, setBilling, errors, firstInputRef }) => (
-  <div className="bg-gradient-to-b from-white/80 to-gray-200 p-6 rounded-lg shadow mb-6">
-    <h2 className="text-xl font-semibold text-[var(--color-secondary)] mb-4">
+  <div className="bg-[var(--color-primary)] p-4 sm:p-6 rounded-lg shadow mb-6">
+    <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4">
       Billing Details
     </h2>
     <label
       htmlFor="billing-fullName"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Full Name
     </label>
@@ -223,18 +230,21 @@ const BillingForm: React.FC<{
       value={billing.fullName}
       onChange={(e) => setBilling({ ...billing, fullName: e.target.value })}
       ref={firstInputRef}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="billing-fullname-error"
     />
     {errors.fullName && (
-      <p id="billing-fullname-error" className="text-red-500 text-sm">
+      <p
+        id="billing-fullname-error"
+        className="text-red-500 text-sm sm:text-base"
+      >
         {errors.fullName}
       </p>
     )}
     <label
       htmlFor="billing-email"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Email
     </label>
@@ -243,13 +253,15 @@ const BillingForm: React.FC<{
       type="email"
       value={billing.email}
       onChange={(e) => setBilling({ ...billing, email: e.target.value })}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
     />
-    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+    {errors.email && (
+      <p className="text-red-500 text-sm sm:text-base">{errors.email}</p>
+    )}
     <label
       htmlFor="billing-phone"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Phone
     </label>
@@ -258,13 +270,15 @@ const BillingForm: React.FC<{
       type="tel"
       value={billing.phone}
       onChange={(e) => setBilling({ ...billing, phone: e.target.value })}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
     />
-    {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+    {errors.phone && (
+      <p className="text-red-500 text-sm sm:text-base">{errors.phone}</p>
+    )}
     <label
       htmlFor="billing-address"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Address
     </label>
@@ -273,29 +287,31 @@ const BillingForm: React.FC<{
       type="text"
       value={billing.address}
       onChange={(e) => setBilling({ ...billing, address: e.target.value })}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
     />
-    {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+    {errors.address && (
+      <p className="text-red-500 text-sm sm:text-base">{errors.address}</p>
+    )}
   </div>
 );
 
 // -------------------------
 // ShippingForm Component
-// Renders the Shipping Information step with explicit labels and persistent guidance.
+// -------------------------
 const ShippingForm: React.FC<{
   shipping: ShippingInfo;
   setShipping: React.Dispatch<React.SetStateAction<ShippingInfo>>;
   errors: Record<string, string>;
   firstInputRef: React.RefObject<HTMLInputElement | null>;
 }> = ({ shipping, setShipping, errors, firstInputRef }) => (
-  <div className="bg-gradient-to-b from-white/80 to-gray-200 p-6 rounded-lg shadow mb-6">
-    <h2 className="text-xl font-semibold text-[var(--color-secondary)] mb-4">
+  <div className="bg-[var(--color-primary)] p-4 sm:p-6 rounded-lg shadow mb-6">
+    <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4">
       Shipping Information
     </h2>
     <label
       htmlFor="shipping-fullName"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Full Name
     </label>
@@ -305,15 +321,17 @@ const ShippingForm: React.FC<{
       value={shipping.fullName}
       onChange={(e) => setShipping({ ...shipping, fullName: e.target.value })}
       ref={firstInputRef}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
     />
     {errors.shippingFullName && (
-      <p className="text-red-500 text-sm">{errors.shippingFullName}</p>
+      <p className="text-red-500 text-sm sm:text-base">
+        {errors.shippingFullName}
+      </p>
     )}
     <label
       htmlFor="shipping-address"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Address
     </label>
@@ -322,15 +340,17 @@ const ShippingForm: React.FC<{
       type="text"
       value={shipping.address}
       onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
     />
     {errors.shippingAddress && (
-      <p className="text-red-500 text-sm">{errors.shippingAddress}</p>
+      <p className="text-red-500 text-sm sm:text-base">
+        {errors.shippingAddress}
+      </p>
     )}
     <label
       htmlFor="shipping-city"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       City
     </label>
@@ -339,13 +359,15 @@ const ShippingForm: React.FC<{
       type="text"
       value={shipping.city}
       onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
-      className="w-full p-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
     />
-    {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+    {errors.city && (
+      <p className="text-red-500 text-sm sm:text-base">{errors.city}</p>
+    )}
     <label
       htmlFor="shipping-postalCode"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Postal Code
     </label>
@@ -354,35 +376,39 @@ const ShippingForm: React.FC<{
       type="text"
       value={formatPostalCode(shipping.postalCode)}
       onChange={(e) => setShipping({ ...shipping, postalCode: e.target.value })}
-      className="w-full p-2 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      maxLength={4}
+      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="postal-code-guide"
     />
-    <p id="postal-code-guide" className="text-xs text-gray-500 mb-2">
+    <p
+      id="postal-code-guide"
+      className="text-xs sm:text-sm text-[var(--color-secondary)] mb-2"
+    >
       Format: 4 digits (e.g., "1234")
     </p>
     {errors.postalCode && (
-      <p className="text-red-500 text-sm">{errors.postalCode}</p>
+      <p className="text-red-500 text-sm sm:text-base">{errors.postalCode}</p>
     )}
   </div>
 );
 
 // -------------------------
-// PaymentForm Component
-// Renders the Payment Details step with explicit labels, input masks, and persistent guidance.
+// PaymentForm Component with Fixed Input Truncation
+// -------------------------
 const PaymentForm: React.FC<{
   payment: PaymentDetails;
   setPayment: React.Dispatch<React.SetStateAction<PaymentDetails>>;
   errors: Record<string, string>;
   firstInputRef: React.RefObject<HTMLInputElement | null>;
 }> = ({ payment, setPayment, errors, firstInputRef }) => (
-  <div className="bg-gradient-to-b from-white/80 to-gray-200 p-6 rounded-lg shadow mb-6">
-    <h2 className="text-xl font-semibold text-[var(--color-secondary)] mb-4 flex items-center">
+  <div className="bg-[var(--color-primary)] p-4 sm:p-6 rounded-lg shadow mb-6">
+    <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4 flex items-center">
       Payment Details{" "}
-      <span className="ml-2 inline-flex items-center text-green-600">
+      <span className="ml-2 inline-flex items-center text-[var(--color-accent)]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-5 w-5 sm:h-6 sm:w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -399,7 +425,7 @@ const PaymentForm: React.FC<{
     </h2>
     <label
       htmlFor="payment-cardNumber"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Card Number
     </label>
@@ -410,19 +436,23 @@ const PaymentForm: React.FC<{
       value={formatCardNumber(payment.cardNumber)}
       onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
       ref={firstInputRef}
-      className="w-full p-2 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      maxLength={19}
+      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="card-number-guide"
     />
-    <p id="card-number-guide" className="text-xs text-gray-500 mb-2">
+    <p
+      id="card-number-guide"
+      className="text-xs sm:text-sm text-[var(--color-secondary)] mb-2"
+    >
       Format: 1234 5678 9012 3456
     </p>
     {errors.cardNumber && (
-      <p className="text-red-500 text-sm">{errors.cardNumber}</p>
+      <p className="text-red-500 text-sm sm:text-base">{errors.cardNumber}</p>
     )}
     <label
       htmlFor="payment-expiryDate"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Expiry Date
     </label>
@@ -431,40 +461,56 @@ const PaymentForm: React.FC<{
       type="text"
       placeholder="MM/YY"
       value={formatExpiryDate(payment.expiryDate)}
-      onChange={(e) => setPayment({ ...payment, expiryDate: e.target.value })}
-      className="w-full p-2 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      onChange={(e) =>
+        setPayment({ ...payment, expiryDate: formatExpiryDate(e.target.value) })
+      }
+      maxLength={5}
+      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="expiry-date-guide"
     />
-    <p id="expiry-date-guide" className="text-xs text-gray-500 mb-2">
+    <p
+      id="expiry-date-guide"
+      className="text-xs sm:text-sm text-[var(--color-secondary)] mb-2"
+    >
       Format: MM/YY
     </p>
     {errors.expiryDate && (
-      <p className="text-red-500 text-sm">{errors.expiryDate}</p>
+      <p className="text-red-500 text-sm sm:text-base">{errors.expiryDate}</p>
     )}
     <label
       htmlFor="payment-cvv"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       CVV
     </label>
     <input
       id="payment-cvv"
       type="text"
-      placeholder="___"
+      placeholder="____"
       value={formatCVV(payment.cvv)}
-      onChange={(e) => setPayment({ ...payment, cvv: e.target.value })}
-      className="w-full p-2 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      onChange={(e) =>
+        setPayment({ ...payment, cvv: formatCVV(e.target.value) })
+      }
+      maxLength={4}
+      inputMode="numeric"
+      pattern="\d{3,4}"
+      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="cvv-guide"
     />
-    <p id="cvv-guide" className="text-xs text-gray-500 mb-2">
+    <p
+      id="cvv-guide"
+      className="text-xs sm:text-sm text-[var(--color-secondary)] mb-2"
+    >
       Format: 3-4 digits
     </p>
-    {errors.cvv && <p className="text-red-500 text-sm">{errors.cvv}</p>}
+    {errors.cvv && (
+      <p className="text-red-500 text-sm sm:text-base">{errors.cvv}</p>
+    )}
     <label
       htmlFor="payment-cardName"
-      className="block text-sm font-medium text-gray-700"
+      className="block text-sm sm:text-base font-medium text-[var(--color-secondary)]"
     >
       Name on Card
     </label>
@@ -474,27 +520,25 @@ const PaymentForm: React.FC<{
       placeholder="Name on Card"
       value={payment.cardName}
       onChange={(e) => setPayment({ ...payment, cardName: e.target.value })}
-      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="w-full p-2 sm:p-3 mb-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
       required
       aria-describedby="card-name-guide"
     />
-    <p id="card-name-guide" className="text-xs text-gray-500 mb-2">
+    <p
+      id="card-name-guide"
+      className="text-xs sm:text-sm text-[var(--color-secondary)] mb-2"
+    >
       Must match Billing Full Name
     </p>
     {errors.cardName && (
-      <p className="text-red-500 text-sm">{errors.cardName}</p>
+      <p className="text-red-500 text-sm sm:text-base">{errors.cardName}</p>
     )}
   </div>
 );
 
 // -------------------------
-// CompletedOrderDetails Component
-// Displays the completed order details with an order number, detailed items list, billing/shipping info, and an estimated delivery date.
-
+// SecureCheckout Component with Loading Indicator on Payment Step
 // -------------------------
-// SecureCheckout Component
-// Implements the multi-step checkout form with a modern card-like layout,
-// robust input validation/guidance, dynamic order details, and an order confirmation modal.
 const SecureCheckout: React.FC = () => {
   const navigate = useNavigate();
   const { cartItems, clearCart, getSubtotal } = useCart();
@@ -518,27 +562,24 @@ const SecureCheckout: React.FC = () => {
     cardName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [ariaMessage, setAriaMessage] = useState("");
   const [, setPaymentSuccess] = useState(false);
   const [toast, setToast] = useState("");
-  // State for the order confirmation and clear cart modals.
   const [showOrderConfirmationModal, setShowOrderConfirmationModal] =
     useState<boolean>(false);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
-  // Ref for focus management.
   const firstInputRef = useRef<HTMLInputElement | null>(null);
   const [orderNumber, setOrderNumber] = useState<string>("");
+
   useEffect(() => {
     setOrderNumber(`${Math.floor(100000 + Math.random() * 900000)}`);
   }, []);
 
-  // Shift focus to the first input on step change.
   useEffect(() => {
     firstInputRef.current?.focus();
   }, [step]);
 
-  // Validate inputs for the current step.
   const validateStep = (): boolean => {
     const newErrors: Record<string, string> = {};
     let valid = true;
@@ -605,13 +646,12 @@ const SecureCheckout: React.FC = () => {
     return valid;
   };
 
-  // Handler to move to the next step.
   const handleNext = async () => {
     if (!validateStep()) return;
     if (step === 3) {
       setProcessing(true);
       setAriaMessage("Processing payment...");
-      // Simulate secure payment processing.
+      // Simulate payment processing delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setProcessing(false);
       setPaymentSuccess(true);
@@ -622,7 +662,6 @@ const SecureCheckout: React.FC = () => {
     trackEvent("step_transition", { step: step + 1 });
   };
 
-  // Handler to move back a step.
   const handleBack = () => {
     if (step > 1) {
       setStep((prev) => (prev - 1) as CheckoutStep);
@@ -631,30 +670,22 @@ const SecureCheckout: React.FC = () => {
     }
   };
 
-  // Handler to place the order and show confirmation modal.
   const handlePlaceOrder = () => {
     setShowOrderConfirmationModal(true);
     trackEvent("order_placed", { orderTotal: total });
   };
 
-  // Toast helper for feedback.
   const showToast = (message: string) => {
     setToast(message);
     setAriaMessage(message);
     setTimeout(() => setToast(""), 3000);
   };
 
-  // When order confirmation modal is confirmed, clear the cart and navigate.
-  // Inside SecureCheckout component, update the order confirmation handler:
   const handleOrderConfirmation = () => {
-    // For the purpose of this example, we'll group the cart items
     const groupedItems = groupCartItems(cartItems);
-    // Compute an estimated delivery date (e.g., current date + 5 days)
     const estimatedDeliveryDate = new Date();
     estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 5);
     const formattedDeliveryDate = estimatedDeliveryDate.toLocaleDateString();
-
-    // Build the order object
     const order = {
       orderNumber,
       items: groupedItems,
@@ -670,49 +701,40 @@ const SecureCheckout: React.FC = () => {
       },
       estimatedDelivery: formattedDeliveryDate,
     };
-
-    // Store the order details in local storage for later retrieval
     localStorage.setItem("orderDetails", JSON.stringify(order));
-
-    // Clear the cart and close the confirmation modal
     clearCart();
     setShowOrderConfirmationModal(false);
     showToast("Order placed successfully!");
-
-    // Navigate to the Order Confirmation view (or simply display the modal)
     navigate("/order-confirmation");
   };
 
-  // Dynamic pricing calculations using cart data.
   const subtotal = getSubtotal();
   const tax = subtotal * 0.1;
   const shippingCost = subtotal < 50 ? 5 : 0;
   const discount = 0;
   const discountAmount = subtotal * discount;
   const total = subtotal + tax + shippingCost - discountAmount;
-  // Get grouped cart items for detailed order review.
   const groupedItems = groupCartItems(cartItems);
 
   return (
-    <div className="bg-[var(--color-primary)] min-h-screen p-6">
-      {/* ARIA live region for dynamic updates */}
+    <div className="bg-[var(--color-primary)] min-h-screen p-4 sm:p-6 md:p-8">
       <div aria-live="polite" className="sr-only">
         {ariaMessage}
       </div>
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+      <div className="max-w-4xl mx-auto bg-[var(--color-primary)] rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
         {/* Progress Indicator */}
-        <div className="flex justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between mb-6">
           {["Billing", "Shipping", "Payment", "Review"].map((label, index) => (
             <div
               key={index}
-              className={`flex-1 text-center py-2 border-b-4 ${
+              className={`flex-1 text-center py-2 mb-2 sm:mb-0 border-b-4 ${
                 step === index + 1
-                  ? "border-[var(--color-accent)] text-[var(--color-secondary)] font-bold"
-                  : "border-gray-300 text-gray-500"
+                  ? "border-[var(--color-accent)] text-[var(--color-accent)] font-bold"
+                  : "border-gray-300 text-[var(--color-secondary)]"
               }`}
               aria-label={`Step ${index + 1}: ${label}`}
             >
-              {label}
+              <span className="block text-sm sm:text-base">{label}</span>
             </div>
           ))}
         </div>
@@ -744,25 +766,26 @@ const SecureCheckout: React.FC = () => {
         {step === 4 && (
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1">
-              {/* Completed Order Details View */}
-              <div className="bg-white p-6 rounded-lg shadow mb-6">
-                <h2 className="text-xl font-semibold text-[var(--color-secondary)] mb-4">
+              {/* Completed Order Details */}
+              <div className="bg-[var(--color-primary)] p-4 sm:p-6 rounded-lg shadow mb-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4">
                   Completed Order Details
                 </h2>
-                {/* Generate a random order number */}
-                <p className="mb-2">
-                  Order Number: <span className="font-bold">{orderNumber}</span>
+                <p className="mb-2 text-[var(--color-secondary)]">
+                  Order Number:{" "}
+                  <span className="font-bold text-[var(--color-secondary)]">
+                    {orderNumber}
+                  </span>
                 </p>
-                {/* Detailed list of purchased items */}
                 <div className="mb-4">
-                  <h3 className="text-lg font-bold text-[var(--color-secondary)]">
+                  <h3 className="text-lg sm:text-xl font-bold text-[var(--color-secondary)]">
                     Purchased Items
                   </h3>
                   <ul className="list-disc ml-6">
                     {groupedItems.map((item) => (
                       <li
                         key={`${item.id}-${item.size || "default"}`}
-                        className="text-sm"
+                        className="text-sm sm:text-base text-[var(--color-secondary)]"
                       >
                         {item.name} {item.size && `(${item.size})`} – Qty:{" "}
                         {item.quantity} – ${item.price.toFixed(2)} each
@@ -771,30 +794,39 @@ const SecureCheckout: React.FC = () => {
                   </ul>
                 </div>
                 <div className="mb-4">
-                  <h3 className="text-lg font-bold text-[var(--color-secondary)]">
+                  <h3 className="text-lg sm:text-xl font-bold text-[var(--color-secondary)]">
                     Billing Information
                   </h3>
-                  <p className="text-sm">Name: {billing.fullName}</p>
-                  <p className="text-sm">Email: {billing.email}</p>
-                  <p className="text-sm">Phone: {billing.phone}</p>
-                  <p className="text-sm">Address: {billing.address}</p>
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
+                    Name: {billing.fullName}
+                  </p>
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
+                    Email: {billing.email}
+                  </p>
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
+                    Phone: {billing.phone}
+                  </p>
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
+                    Address: {billing.address}
+                  </p>
                 </div>
                 <div className="mb-4">
-                  <h3 className="text-lg font-bold text-[var(--color-secondary)]">
+                  <h3 className="text-lg sm:text-xl font-bold text-[var(--color-secondary)]">
                     Shipping Information
                   </h3>
-                  <p className="text-sm">Name: {shipping.fullName}</p>
-                  <p className="text-sm">
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
+                    Name: {shipping.fullName}
+                  </p>
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
                     Address: {shipping.address}, {shipping.city},{" "}
                     {shipping.postalCode}
                   </p>
                 </div>
-                {/* Estimated delivery date (e.g., current date + 5 days) */}
                 <div>
-                  <h3 className="text-lg font-bold text-[var(--color-secondary)]">
+                  <h3 className="text-lg sm:text-xl font-bold text-[var(--color-secondary)]">
                     Estimated Delivery
                   </h3>
-                  <p className="text-sm">
+                  <p className="text-sm sm:text-base text-[var(--color-secondary)]">
                     {new Date(
                       new Date().setDate(new Date().getDate() + 5)
                     ).toLocaleDateString()}
@@ -802,23 +834,31 @@ const SecureCheckout: React.FC = () => {
                 </div>
               </div>
             </div>
-            {/* Sticky Sidebar Order Summary */}
-            <div className="w-full lg:w-1/3 sticky top-6 bg-white rounded-lg shadow p-6">
-              <h3 className="text-2xl font-bold mb-4">Order Summary</h3>
-              <p className="text-lg">Subtotal: ${subtotal.toFixed(2)}</p>
-              <p className="text-lg">Tax (10%): ${tax.toFixed(2)}</p>
-              <p className="text-lg">Shipping: ${shippingCost.toFixed(2)}</p>
+            {/* Order Summary Sidebar */}
+            <div className="w-full lg:w-1/3 bg-[var(--color-primary)] rounded-lg shadow p-4 sm:p-6 sticky top-6">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-[var(--color-secondary)]">
+                Order Summary
+              </h3>
+              <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
+                Subtotal: ${subtotal.toFixed(2)}
+              </p>
+              <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
+                Tax (10%): ${tax.toFixed(2)}
+              </p>
+              <p className="text-lg sm:text-xl text-[var(--color-secondary)]">
+                Shipping: ${shippingCost.toFixed(2)}
+              </p>
               {discount > 0 && (
-                <p className="text-lg text-green-600">
+                <p className="text-lg sm:text-xl text-[var(--color-accent)]">
                   Discount: -${discountAmount.toFixed(2)}
                 </p>
               )}
-              <p className="text-2xl font-bold mt-4">
+              <p className="text-2xl sm:text-3xl font-bold mt-4 text-[var(--color-secondary)]">
                 Total: ${total.toFixed(2)}
               </p>
               <button
                 onClick={() => setShowConfirmModal(true)}
-                className="mt-4 w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400"
+                className="mt-4 w-full px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                 aria-label="Clear cart"
               >
                 Clear Cart
@@ -827,11 +867,11 @@ const SecureCheckout: React.FC = () => {
           </div>
         )}
         {/* Navigation Buttons */}
-        <div className="mt-6 flex justify-between">
+        <div className="mt-6 flex flex-col sm:flex-row justify-between gap-2">
           {step > 1 && (
             <button
               onClick={handleBack}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-primary)] border border-[var(--color-secondary)] text-[var(--color-secondary)] rounded hover:bg-gray-200 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
               aria-label="Go back to previous step"
             >
               Back
@@ -840,16 +880,45 @@ const SecureCheckout: React.FC = () => {
           {step < 4 && (
             <button
               onClick={handleNext}
-              className="ml-auto px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              disabled={processing}
+              className={`ml-auto px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
+                processing ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               aria-label="Continue to next step"
             >
-              Next
+              {processing ? (
+                <span className="flex items-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-[var(--color-secondary)]"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                "Next"
+              )}
             </button>
           )}
           {step === 4 && (
             <button
               onClick={handlePlaceOrder}
-              className="ml-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="ml-auto px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
               aria-label="Place order"
             >
               Place Order
@@ -857,20 +926,16 @@ const SecureCheckout: React.FC = () => {
           )}
         </div>
       </div>
-      {/* Toast Notification */}
       {toast && <Toast message={toast} />}
-      {/* ARIA live region for dynamic updates */}
       <div aria-live="polite" className="sr-only">
         {ariaMessage}
       </div>
-      {/* Order Confirmation Modal */}
       {showOrderConfirmationModal && (
         <OrderConfirmationModal
           onConfirm={handleOrderConfirmation}
           onClose={() => setShowOrderConfirmationModal(false)}
         />
       )}
-      {/* Confirm Clear Cart Modal */}
       {showConfirmModal && (
         <ConfirmModal
           name="Clear Cart"

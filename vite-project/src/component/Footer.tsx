@@ -138,8 +138,8 @@ const NewsletterSignup: React.FC = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your email"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md md:rounded-l-md md:rounded-r-none focus:outline-none focus:ring-2 transition-colors duration-300"
+          placeholder="Enter your Email"
+          className="w-full px-3 text-[var(--color-secondary)] py-2 border border-[var(--color-accent-30)] rounded-md md:rounded-l-md md:rounded-r-none focus:outline-none focus:ring-2 transition-colors duration-300"
           aria-label="Email address"
           style={{ borderColor: "var(--color-accent)" }}
         />

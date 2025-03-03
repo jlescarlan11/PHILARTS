@@ -173,12 +173,12 @@ const CartConfirmationModal: React.FC<CartConfirmationModalProps> = ({
       aria-describedby="cart-confirmation-desc"
     >
       <div
-        className="absolute inset-0 bg-black opacity-50"
+        className="absolute inset-0 bg-[var(--color-secondary)] opacity-50"
         aria-hidden="true"
       ></div>
       <div
         ref={modalRef}
-        className="relative bg-white p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300"
+        className="relative bg-[var(--color-primary)] p-6 rounded-lg max-w-md w-full z-10 transition-transform duration-300"
       >
         <h3
           id="cart-confirmation-title"
@@ -193,28 +193,30 @@ const CartConfirmationModal: React.FC<CartConfirmationModalProps> = ({
           Your product was added to your cart. Would you like to review your
           cart or continue shopping?
         </p>
-        <div className="mt-4 flex justify-end space-x-2">
+        <div className="mt-4 flex justify-between space-x-2">
           <button
             onClick={onUndo}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+            className="px-4 py-2 bg-[var(--color-secondary-50)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-secondary-40)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
             aria-label="Undo the cart addition"
           >
             Undo
           </button>
-          <button
-            onClick={onViewCart}
-            className="px-4 py-2 bg-[var(--color-accent)] text-white rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
-            aria-label="Go to your cart to review your selections"
-          >
-            View Cart
-          </button>
-          <button
-            onClick={onContinue}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
-            aria-label="Continue browsing products"
-          >
-            Continue Shopping
-          </button>
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={onViewCart}
+              className="px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] hover:bg-[var(--color-accent-90)] rounded hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              aria-label="Go to your cart to review your selections"
+            >
+              View Cart
+            </button>
+            <button
+              onClick={onContinue}
+              className="px-4 py-2 bg-[var(--color-tertiary)] text-[var(--color-primary)] rounded hover:bg-[var(--color-tertiary-90)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400"
+              aria-label="Continue browsing products"
+            >
+              Continue Shopping
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -528,7 +530,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </button>
       </div>
       {/* Product details overlaid on the bottom */}
-      <div className="absolute bottom-4 left-4 right-4 text-[var(--color-primary)]">
+      <div className="absolute font-normal bottom-4 left-4 right-4 text-[var(--color-primary)]">
         <h3 className="text-2xl font-bold">{product.name}</h3>
         <p className="text-sm">{product.description}</p>
         <p className="text-xs font-semibold mt-1">

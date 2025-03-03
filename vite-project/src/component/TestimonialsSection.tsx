@@ -549,7 +549,7 @@ const TestimonialsSection: React.FC = () => {
         {announcement}
       </div>
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-[var(--color-secondary)]">
           What Our Customers Say
         </h2>
         {/* Slider Container */}
