@@ -218,10 +218,10 @@ const ContactForm: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full px-6 py-4 text-lg rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
+              className={`w-full px-6 py-4 text-lg rounded-full transition-all text-[var(--color-primary)]  duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${
                 isSubmitting
                   ? "bg-[var(--color-accent)] bg-opacity-50 cursor-not-allowed"
-                  : "bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)]"
+                  : "bg-[var(--color-accent)] hover:bg-[var(--color-accent-90)]"
               }`}
             >
               {isSubmitting ? (
