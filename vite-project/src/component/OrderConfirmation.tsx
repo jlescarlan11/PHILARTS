@@ -199,7 +199,7 @@ const OrderConfirmation: React.FC = () => {
       const itemRows = order.items.map((item) => [
         `${item.name}${item.size ? " (" + item.size + ")" : ""}`,
         String(item.quantity),
-        `$${item.price.toFixed(2)}`,
+        `₱${item.price.toFixed(2)}`,
       ]);
       autoTable(doc, {
         head: [["Item", "Quantity", "Unit Price"]],
@@ -239,24 +239,24 @@ const OrderConfirmation: React.FC = () => {
       doc.text("Pricing Summary:", 20, finalY + 86);
       doc.setFontSize(12);
       doc.text(
-        `Subtotal: $${order.pricing.subtotal.toFixed(2)}`,
+        `Subtotal: ₱${order.pricing.subtotal.toFixed(2)}`,
         20,
         finalY + 94
       );
-      doc.text(`Tax (10%): $${order.pricing.tax.toFixed(2)}`, 20, finalY + 102);
+      doc.text(`Tax (10%): ₱${order.pricing.tax.toFixed(2)}`, 20, finalY + 102);
       doc.text(
-        `Shipping: $${order.pricing.shippingCost.toFixed(2)}`,
+        `Shipping: ₱${order.pricing.shippingCost.toFixed(2)}`,
         20,
         finalY + 110
       );
       if (order.pricing.discount > 0) {
         doc.text(
-          `Discount: -$${order.pricing.discountAmount.toFixed(2)}`,
+          `Discount: -₱${order.pricing.discountAmount.toFixed(2)}`,
           20,
           finalY + 118
         );
       }
-      doc.text(`Total: $${order.pricing.total.toFixed(2)}`, 20, finalY + 126);
+      doc.text(`Total: ₱${order.pricing.total.toFixed(2)}`, 20, finalY + 126);
       doc.line(20, finalY + 130, 190, finalY + 130);
 
       // Footer / Thank You Note
