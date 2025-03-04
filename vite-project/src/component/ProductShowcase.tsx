@@ -30,7 +30,7 @@ const products: Product[] = [
     id: "1",
     name: "Nutcha Bites Original",
     description:
-      "Savor the timeless taste of our Nutcha Bite Classic – a delightful fusion of traditional Iloilo flavors with a modern matcha twist. A must-try favorite!",
+      "Savor the timeless taste of our Nutcha Bite Classic – a delightful fusion of traditional Iloilo flavors with a modern matcha twist. A nutcha-try favorite!",
     price: 30,
     image: `${nutcha1}`, // already a .webp image
     sizes: [
@@ -46,7 +46,7 @@ const products: Product[] = [
     id: "2",
     name: "Nutcha Bites Deluxe",
     description:
-      " Indulge in our Nutcha Bite Deluxe  – a perfect blend of heritage and innovation. A must-try favorite!",
+      "Experience the Nutcha Bite Deluxe—a masterful fusion of time-honored flavors and a contemporary matcha twist. Delicately sprinkled with premium matcha, each bite unveils a harmonious blend of rich heritage and vibrant green tea essence, inviting you to savor an elevated, unforgettable treat.",
     price: 35,
     image: "/images/product2", // assumed .webp
     sizes: [
