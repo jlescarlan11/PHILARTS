@@ -1,16 +1,14 @@
 // MobileMenu.tsx
-// This component renders the mobile bottom sheet menu with a minimal, modern look.
+// Refactored mobile bottom sheet menu with a minimal, modern layout.
 // Changes include:
-// • A compact layout with ample white space and consistent grid spacing.
-// • Clear visual dividers between nav items and CTAs.
-// • Preventing native pull-to-refresh via e.preventDefault() in touch events.
-// • A visible close button is always available as a fallback for dismissing the menu.
-// • (Optional) A subtle parallax effect during swipe gestures.
-import React, { useState } from "react";
+// • Disabling background scrolling when the menu is open via a "no-scroll" class on body.
+// • Using e.preventDefault() in touch event handlers to prevent native pull‑to‑refresh.
+// • Removing extra theme controls and optional parallax effect.
+// • Providing a clearly visible close button as the primary dismiss mechanism.
+import React, { useState, useEffect } from "react";
 import FocusLock from "react-focus-lock";
 import { HashLink } from "react-router-hash-link";
 import NavItem from "./NavItem";
-import DarkModeToggle from "./DarkModeToggle";
 import { trackEvent } from "../utils/analytics";
 
 interface MobileMenuProps {
@@ -33,40 +31,49 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   contentItems,
   cartCount,
   navigate,
-  darkMode,
-  toggleDarkMode,
 }) => {
-  // State for tracking touch swipe distance and timing
+  // State for swipe-to-dismiss gesture
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
   const [swipeStartTime, setSwipeStartTime] = useState<number | null>(null);
   const swipeThreshold = 120; // Minimum swipe distance to trigger dismiss
 
-  // State for showing a contextual tooltip (e.g., "Swipe down to dismiss")
+  // State for contextual tooltip (e.g., "Swipe down to dismiss")
   const [showTooltip, setShowTooltip] = useState(true);
 
-  // Handle initial touch: record start Y and time, and prevent default to help block native refresh.
+  // Toggle background scrolling off when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    // Cleanup in case component unmounts while open
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, [isOpen]);
+
+  // Handle initial touch: record start position and time; prevent default to block native refresh.
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Prevent native pull-to-refresh
     e.preventDefault();
     setTouchStartY(e.touches[0].clientY);
     setSwipeStartTime(Date.now());
     setShowTooltip(true);
   };
 
-  // Handle touch move: compute swipe delta with an elastic (resisted) effect and optional parallax.
+  // Handle touch move: calculate swipe delta with an elastic effect.
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault(); // Attempt to block native refresh behavior
+    e.preventDefault();
     if (touchStartY !== null) {
       const delta = e.touches[0].clientY - touchStartY;
-      // Only consider downward swipes; apply 0.5 resistance for a natural elastic feel.
+      // Apply resistance for downward swipe (0.5 factor)
       setTouchDeltaY(delta > 0 ? delta * 0.5 : 0);
     }
   };
 
   // On touch end, check if the swipe distance exceeds threshold.
-  // If so, dismiss the menu and capture swipe analytics.
-  // Otherwise, reset the swipe state.
+  // If yes, capture swipe analytics and dismiss; otherwise, reset state.
   const handleTouchEnd = () => {
     const swipeDuration = swipeStartTime ? Date.now() - swipeStartTime : 0;
     if (touchDeltaY > swipeThreshold) {
@@ -82,7 +89,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
     setShowTooltip(false);
   };
 
-  // Apply a subtle parallax effect by translating the menu as the user swipes.
+  // For simplicity, we remove any parallax effect here.
+  // The menu simply translates vertically based on touchDeltaY.
   const menuStyle = {
     transform: isOpen ? `translateY(${touchDeltaY}px)` : "translateY(100%)",
     transition:
@@ -93,7 +101,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <>
-      {/* Semi-transparent, blurred overlay */}
+      {/* Overlay with blur to focus attention on the menu */}
       {isOpen && (
         <div
           onClick={closeMenu}
@@ -113,14 +121,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* ARIA live region with detailed feedback */}
+          {/* Expanded ARIA live region for detailed feedback */}
           <div aria-live="assertive" className="sr-only">
             {isOpen
               ? "Mobile menu opened. Swipe down to dismiss, or tap the close button."
               : "Mobile menu closed."}
           </div>
 
-          {/* Header area: Drag indicator and a visible close button */}
+          {/* Header area: Drag indicator and always-visible close button */}
           <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
             <div className="flex flex-col items-center">
               <div className="w-12 h-1 bg-gray-400 rounded-full" />
@@ -130,7 +138,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 </span>
               )}
             </div>
-            {/* Always visible close button as fallback */}
+            {/* Visible close button as the primary dismiss mechanism */}
             <button
               onClick={closeMenu}
               aria-label="Close menu"
@@ -140,9 +148,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </button>
           </div>
 
-          {/* Content area using grid layout for consistent spacing */}
+          {/* Main content: Grid layout for navigation items and CTAs */}
           <div className="px-6 py-4 grid gap-6">
-            {/* Navigation items with clear visual dividers */}
+            {/* Navigation items with clear dividers */}
             <ul
               className="grid gap-4 border-b border-gray-300 pb-4"
               role="menu"
