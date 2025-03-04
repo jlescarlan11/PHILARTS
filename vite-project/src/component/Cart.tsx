@@ -48,7 +48,7 @@ const groupCartItems = (items: CartItem[]): CartItem[] => {
 // Toast Component
 // Displays temporary toast notifications.
 const Toast: React.FC<{ message: string }> = ({ message }) => (
-  <div className="fixed bottom-4 right-4 bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded shadow-md animate-fadeIn">
+  <div className="fixed bottom-14 right-4 bg-[var(--color-accent)] text-[var(--color-primary)] px-4 py-2 rounded shadow-md animate-fadeIn z-50">
     {message}
   </div>
 );

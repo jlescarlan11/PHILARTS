@@ -24,7 +24,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
     <div
       role="navigation"
       aria-label="Bottom Navigation"
-      className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner flex justify-around items-center py-1 z-40"
+      className="fixed bottom-0 left-0 right-0 bg-[var(--color-primary)] text-[var(--color-secondary)] shadow-inner flex justify-around items-center py-1 z-40"
     >
       {/* Dark mode toggle button added to the bottom nav */}
       <button
@@ -32,7 +32,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
           toggleDarkMode();
           trackEvent("bottom_nav_darkmode_toggle", { darkMode: !darkMode });
         }}
-        className="p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 transition transform duration-200 hover:scale-105 hover:shadow-sm"
+        className="p-1 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition transform duration-200 hover:scale-105 hover:shadow-sm"
         title="Toggle Dark Mode"
       >
         {darkMode ? (
@@ -46,7 +46,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
         smooth
         to="/#products"
         onClick={() => trackEvent("bottom_nav_click", { section: "order" })}
-        className="text-base font-bold px-3 py-1 rounded bg-green-700 text-white transition transform duration-200 hover:scale-105 hover:shadow-sm"
+        className="text-base font-bold px-3 py-1 rounded bg-[var(--color-accent)] text-[var(--color-primary)] transition transform duration-200 hover:scale-105 hover:shadow-sm"
       >
         Order Now
       </HashLink>
@@ -56,12 +56,12 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
           trackEvent("bottom_nav_click", { section: "cart" });
           navigate("/cart");
         }}
-        className="relative p-1 focus:outline-none focus:ring-3 focus:ring-red-500 transition transform duration-200 hover:scale-105 hover:shadow-sm"
+        className="relative p-1 focus:outline-none focus:ring-3 focus:ring-[var(--color-accent)] transition transform duration-200 hover:scale-105 hover:shadow-sm"
         title="View Cart"
       >
         <MdShoppingCart className="w-7 h-7" />
         {cartCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1">
+          <span className="absolute -top-1 -right-1 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs font-bold rounded-full px-1">
             {cartCount}
           </span>
         )}

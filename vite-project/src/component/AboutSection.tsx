@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink } from "react-router-hash-link";
-import aboutImage from "../assets/hero-image.webp";
+import aboutImage from "../assets/about_nutcha.svg";
 
 /* -------------------------------------------------------
    Custom Hook: useInViewAnimation
@@ -65,7 +65,7 @@ const AboutVisual: React.FC = () => {
           src="/images/about-nutchabite-highres.jpg"
           alt="Nutcha Bite delicacy with a matcha twist, blending Iloilo tradition with modern flavor"
           loading="lazy"
-          className="rounded-lg shadow-lg w-full max-h-[500px] object-cover transition-transform duration-500 hover:scale-105"
+          className="rounded-lg shadow-lg w-full max-h-[600px] object-cover transition-transform duration-500 hover:scale-105"
         />
       </picture>
     </div>

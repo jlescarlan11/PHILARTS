@@ -207,7 +207,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     <p className="text-center text-lg font-semibold text-[var(--color-accent)]">
       {testimonial.name}
       {testimonial.verified && (
-        <span className="ml-2 px-2 py-1 text-xs font-medium text-[var(--color-primary)] bg-[var(--color-tertiary)] rounded-full">
+        <span className="ml-4 px-2 text-xs font-medium text-[var(--color-primary)] bg-[var(--color-tertiary)] rounded-full">
           Verified Buyer
         </span>
       )}

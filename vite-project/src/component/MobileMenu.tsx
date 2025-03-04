@@ -114,7 +114,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       {isOpen && (
         <div
           onClick={closeMenu}
-          className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-[var(--color-primary)] bg-opacity-50 backdrop-blur-sm z-40"
           aria-hidden="true"
         />
       )}
@@ -124,7 +124,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           id="mobile-menu"
           role="menu"
           aria-label="Mobile Navigation Menu"
-          className="fixed left-0 right-0 bottom-0 z-50 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-t-xl shadow-lg"
+          className="fixed left-0 right-0 bottom-0 z-50 bg-[var(--color-primary)] text-[var(--color-secondary)] rounded-t-xl shadow-lg"
           style={menuStyle}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -138,11 +138,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </div>
 
           {/* Header area with drag indicator and contextual tooltip */}
-          <div className="flex items-center justify-center px-4 py-2 border-b border-gray-200">
+          <div className="flex items-center justify-center px-4 py-2 border-b border-[var(--color-secondary)]">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-1 bg-gray-400 rounded-full" />
+              <div className="w-12 h-1 bg-[var(--color-secondary)] rounded-full" />
               {showTooltip && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-[var(--color-secondary)]">
                   Swipe down to dismiss
                 </span>
               )}
@@ -153,7 +153,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           <div className="px-6 py-4 grid gap-6">
             {/* Navigation items with clear dividers */}
             <ul
-              className="grid gap-4 border-b border-gray-300 pb-4"
+              className="grid gap-4 border-b border-[var(--color-secondary)] pb-4"
               role="menu"
             >
               {contentItems.map((item) => (
@@ -176,7 +176,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   closeMenu();
                   navigate("/cart");
                 }}
-                className="w-full py-3 rounded bg-red-600 text-white font-bold focus:outline-none focus:ring-3 focus:ring-red-500 transition transform hover:scale-105 shadow-lg"
+                className="w-full py-3 rounded bg-[var(--color-tertiary)] text-[var(--color-primary)] font-bold focus:outline-none focus:ring-3 focus:ring-red-500 transition transform hover:scale-105 shadow-lg"
               >
                 Cart {cartCount > 0 && `(${cartCount})`}
               </button>
@@ -185,7 +185,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 to="/#products"
                 onClick={() => handleNavItemClick("order")}
                 title="Order Now"
-                className="block text-center w-full py-3 rounded bg-green-600 text-white font-bold focus:outline-none focus:ring-3 focus:ring-green-500 transition transform hover:scale-105 shadow-lg"
+                className="block text-center w-full py-3 rounded bg-[var(--color-accent)] text-[var(--color-primary)] font-bold focus:outline-none focus:ring-3 focus:ring-green-500 transition transform hover:scale-105 shadow-lg"
               >
                 Order Now
               </HashLink>

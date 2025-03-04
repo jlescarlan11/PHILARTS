@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import heroImage from "../assets/hero-image.webp";
+import nutcha1 from "../assets/nutcha1.webp";
 // Instead of using useCart from hooks, we import useCartContext from the shared context.
 import { useCartContext } from "./CartContext";
 import { CartItem } from "../hooks/useCart";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
-import { MdRemoveRedEye, MdShoppingCart } from "react-icons/md";
+import { MdBlock, MdRemoveRedEye, MdShoppingCart } from "react-icons/md";
 
 // -------------------------
 // Type Definitions
@@ -28,11 +28,11 @@ export interface Product {
 const products: Product[] = [
   {
     id: "1",
-    name: "Nutcha Bite Deluxe",
+    name: "Nutcha Bites Original",
     description:
-      "Indulge in our Nutcha Bite Deluxe – a delightful fusion of traditional Iloilo flavors with a modern matcha twist. Experience culinary bliss!",
-    price: 12.99,
-    image: `${heroImage}`, // already a .webp image
+      "Savor the timeless taste of our Nutcha Bite Classic – a delightful fusion of traditional Iloilo flavors with a modern matcha twist. A must-try favorite!",
+    price: 30,
+    image: `${nutcha1}`, // already a .webp image
     sizes: [
       { label: "Small", priceAdjustment: 0 },
       { label: "Medium", priceAdjustment: 2 },
@@ -44,10 +44,10 @@ const products: Product[] = [
   },
   {
     id: "2",
-    name: "Nutcha Bite Classic",
+    name: "Nutcha Bites Deluxe",
     description:
-      "Savor the timeless taste of our Nutcha Bite Classic – a perfect blend of heritage and innovation. A must-try favorite!",
-    price: 9.99,
+      " Indulge in our Nutcha Bite Deluxe  – a perfect blend of heritage and innovation. A must-try favorite!",
+    price: 35,
     image: "/images/product2", // assumed .webp
     sizes: [
       { label: "Regular", priceAdjustment: 0 },
@@ -55,7 +55,7 @@ const products: Product[] = [
     ],
     trustBadges: ["Customer Favorite"],
     aggregateRating: 4.3,
-    availability: "InStock",
+    availability: "Out of Stock",
   },
 ];
 
@@ -296,7 +296,7 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({
               >
                 {option.label}{" "}
                 {option.priceAdjustment > 0 &&
-                  `(+$${option.priceAdjustment.toFixed(2)})`}
+                  `(+₱${option.priceAdjustment.toFixed(2)})`}
               </option>
             ))}
           </select>
@@ -407,7 +407,7 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
               {product.description}
             </p>
             <p className="text-sm font-semibold text-[var(--color-accent)] mb-2">
-              ${product.price.toFixed(2)}
+              ₱{product.price.toFixed(2)}
             </p>
             {product.trustBadges && (
               <div className="mb-2">
@@ -445,8 +445,7 @@ const ViewProductModal: React.FC<ViewProductModalProps> = ({
 
 // -------------------------
 // ProductCard Component
-// Displays a full-image card with background set to the product image, gradient overlay, and interactive icons.
-// Updated ProductCard Component with increased height
+// -------------------------
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
@@ -455,6 +454,7 @@ interface ProductCardProps {
   isFavorite: boolean;
   cartCount?: number;
 }
+
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onAddToCart,
@@ -463,15 +463,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isFavorite,
   cartCount,
 }) => {
+  // Use custom hook for responsive image handling
   const { src, error } = useResponsiveImage(product.image);
 
-  // Track product card view event.
+  // Explicitly cast to boolean to ensure the value is always a boolean.
+  // This avoids the possibility of getting an empty string when product.availability is ""
+  const isOutOfStock: boolean = product.availability
+    ? product.availability.toLowerCase().includes("out of stock")
+    : false;
+
+  // Track product card view event for analytics
   useEffect(() => {
     trackEvent("product_card_view", { productId: product.id });
   }, [product.id]);
 
   return (
-    // Increased height: h-96 gives the card a taller dimension (approx. 384px)
     <div
       className="relative h-96 rounded-lg shadow-md p-4 transform transition-transform duration-300 hover:scale-105 overflow-hidden bg-cover bg-center"
       style={{ backgroundImage: `url(${src})` }}
@@ -480,28 +486,31 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Transparent gradient overlay for readability */}
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[var(--color-tertiary-20)] via-[var(--color-tertiary-40)] to-[var(--color-tertiary-70)]"></div>
+
       {/* Display error message for screen readers if the image fails */}
       {error && (
         <div role="alert" aria-live="assertive" className="sr-only">
           Unable to load product image.
         </div>
       )}
-      {/* Interactive icons with persuasive ARIA labels */}
+
+      {/* Interactive icons */}
       <div className="absolute top-4 right-4 flex flex-col space-y-2">
+        {/* View Product Button */}
         <button
           onClick={() => onViewProduct(product)}
           className="p-2 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
           aria-label={`Discover more about ${product.name}`}
         >
-          {/* Eye Icon */}
           <MdRemoveRedEye className="text-[var(--color-primary)]" />
         </button>
+        {/* Add to Cart Button - Disabled if out of stock */}
         <button
           onClick={() => onAddToCart(product)}
-          className="relative p-2 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+          disabled={isOutOfStock}
+          className="relative p-2 flex items-center justify-center bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={`Add ${product.name} to your cart now`}
         >
-          {/* Cart Icon */}
           <MdShoppingCart className="text-[var(--color-primary)]" />
           {(cartCount ?? 0) > 0 && (
             <span className="absolute -top-1 -right-1 bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs rounded-full px-1">
@@ -509,6 +518,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           )}
         </button>
+        {/* Toggle Favorite Button */}
         <button
           onClick={() => onToggleFavorite(product)}
           className="p-2 bg-[var(--color-accent)] rounded-full shadow hover:bg-[var(--color-accent-90)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
@@ -525,25 +535,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </button>
       </div>
+
       {/* Product details overlaid on the bottom */}
       <div className="absolute font-normal bottom-4 left-4 right-4 text-[var(--color-primary)]">
         <h3 className="text-2xl font-bold">{product.name}</h3>
         <p className="text-sm">{product.description}</p>
         <p className="text-xs font-semibold mt-1">
-          ${product.price.toFixed(2)}
+          ₱{product.price.toFixed(2)}
         </p>
-        {product.trustBadges && (
-          <div className="mt-2">
-            {product.trustBadges.map((badge, idx) => (
+        {/* Trust badges and Out-of-Stock Indicator */}
+        <div className="mt-2 flex items-center space-x-2">
+          {product.trustBadges &&
+            product.trustBadges.map((badge, idx) => (
               <span
                 key={idx}
-                className="inline-block bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs px-2 py-1 rounded mr-2"
+                className="inline-block bg-[var(--color-tertiary)] text-[var(--color-primary)] text-xs px-2 py-1 rounded"
               >
                 {badge}
               </span>
             ))}
-          </div>
-        )}
+          {/* Display Out-of-Stock label if applicable */}
+          {isOutOfStock && (
+            <span className="inline-flex items-center bg-[var(--color-accent)] text-[var(--color-primary)] text-xs px-2 py-1 rounded">
+              <MdBlock className="mr-1" />
+              Out of Stock
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
