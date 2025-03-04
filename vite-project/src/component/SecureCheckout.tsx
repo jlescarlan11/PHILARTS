@@ -195,7 +195,7 @@ const OrderConfirmationModal: React.FC<{
       <div className="mt-4 flex justify-end">
         <button
           onClick={onConfirm}
-          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-secondary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="px-4 py-3 sm:px-6 sm:py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded hover:bg-[var(--color-accent)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           aria-label="Close confirmation"
         >
           OK
@@ -725,7 +725,7 @@ const SecureCheckout: React.FC = () => {
   const groupedItems = groupCartItems(cartItems);
 
   return (
-    <div className="bg-[var(--color-primary)] min-h-screen p-4 sm:p-6 md:p-8">
+    <div className="bg-[var(--color-primary)] min-h-screen p-4 mb-10 md:mb-0 sm:p-6 md:p-8">
       <div aria-live="polite" className="sr-only">
         {ariaMessage}
       </div>

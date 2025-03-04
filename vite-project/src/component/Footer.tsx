@@ -228,7 +228,7 @@ const BackToTop: React.FC = () => {
       {isVisible && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 bg-[var(--color-accent)] text-[var(--color-primary)] px-3 py-3 rounded-full shadow-lg hover:bg-opacity-80 focus:outline-none focus:ring-2 transition-all duration-300"
+          className="fixed bottom-16  md:bottom-6 right-6 bg-[var(--color-accent)] text-[var(--color-primary)] px-2 py-2 rounded-full shadow-lg hover:bg-opacity-80 focus:outline-none focus:ring-2 transition-all duration-300"
           aria-label="Back to top"
         >
           <MdArrowUpward className="size-4" />
@@ -261,7 +261,7 @@ const Footer: React.FC = () => {
         className="mt-4 border-t"
         style={{ borderColor: "var(--color-accent)" }}
       >
-        <div className="max-w-7xl mx-auto pt-4 flex justify-center">
+        <div className="max-w-7xl mx-auto pt-4 flex justify-center mb-10 md:mb-0">
           <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
             &copy; {currentYear} John Lester Escarlan | All rights reserved
           </p>

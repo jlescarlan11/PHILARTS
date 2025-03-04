@@ -306,7 +306,7 @@ const OrderConfirmation: React.FC = () => {
   }
 
   return (
-    <main className="bg-[var(--color-primary)] min-h-screen p-4 md:p-6 lg:p-8">
+    <main className="bg-[var(--color-primary)] min-h-screen mb-10 md:mb-0 p-4 md:p-6 lg:p-8">
       {/* Print-specific styles */}
       <style>{`
         @media print {
