@@ -224,7 +224,7 @@ const Navbar: React.FC = () => {
               onClick={() => navigate("/cart")}
               className="p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors duration-300 relative"
             >
-              <MdStore />
+              <MdStore className="size-4 text-[var(--color-secondary)]" />
 
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-600 text-[var(--color-primary)] text-xs font-bold rounded-full px-2">
