@@ -35,8 +35,8 @@ const products: Product[] = [
     image: `${nutcha1}`, // already a .webp image
     sizes: [
       { label: "Small", priceAdjustment: 0 },
-      { label: "Medium", priceAdjustment: 2 },
-      { label: "Large", priceAdjustment: 4 },
+      { label: "Medium", priceAdjustment: 15 },
+      { label: "Large", priceAdjustment: 25 },
     ],
     trustBadges: ["Bestseller", "Free Shipping"],
     aggregateRating: 4.5,
