@@ -1,5 +1,9 @@
 const ErrorPage = () => {
-  return <div>It is not available in the meantime. Come back later.</div>;
+  return (
+    <div className="text-center text[var(--color-secondary)]">
+      It is not available in the meantime. Please come back later.
+    </div>
+  );
 };
 
 export default ErrorPage;
