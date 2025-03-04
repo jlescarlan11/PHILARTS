@@ -230,31 +230,6 @@ const AboutSection: React.FC = () => {
           <AboutVisual />
           <AboutNarrative inView={inView} onCTAClick={handleCTAClick} />
         </div>
-        {/* Interactive Scroll Indicator */}
-        <div className="mt-12 flex justify-center">
-          <HashLink
-            smooth
-            to="#menu"
-            title="Scroll Down"
-            className="animate-bounce text-[var(--color-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-tertiary)]"
-            aria-label="Scroll Down to Menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </HashLink>
-        </div>
       </section>
     </>
   );
