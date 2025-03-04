@@ -16,6 +16,7 @@ import MobileMenu from "./MobileMenu";
 import BottomNavBar from "./BottomNavBar";
 import { trackEvent } from "../utils/analytics";
 import { useCartContext } from "./CartContext";
+import { MdStore } from "react-icons/md";
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
@@ -223,9 +224,8 @@ const Navbar: React.FC = () => {
               onClick={() => navigate("/cart")}
               className="p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors duration-300 relative"
             >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 4h-2l-3 7v9a1 1 0 001 1h16a1 1 0 001-1v-9l-3-7h-2" />
-              </svg>
+              <MdStore />
+
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-600 text-[var(--color-primary)] text-xs font-bold rounded-full px-2">
                   {cartCount}
