@@ -117,7 +117,7 @@ const ContactForm: React.FC = () => {
 
   const handleRecaptchaChange = (token: string | null) => {
     setValue("recaptcha", token || "");
-    trackEvent("RecaptchaVerified");
+    trackEvent("RecaptchaVerified", { token });
   };
 
   return (
