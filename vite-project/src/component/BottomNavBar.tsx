@@ -1,6 +1,6 @@
 // BottomNavBar.tsx
-// Refactored sticky bottom navigation bar for mobile with reduced height for a more compact look.
-// Key CTAs ("Order Now" and "Cart") are prominently displayed with bold colors and micro-interactions.
+// This sticky bottom navigation bar is designed to be short and unobtrusive.
+// It uses minimal vertical padding and a compact layout while clearly displaying the key CTAs.
 import React from "react";
 import { HashLink } from "react-router-hash-link";
 import { MdShoppingCart } from "react-icons/md";
