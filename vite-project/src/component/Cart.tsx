@@ -280,7 +280,7 @@ const Cart: React.FC = () => {
   // Pricing calculations.
   const subtotal = getSubtotal();
   const tax = subtotal * 0.1;
-  const shipping = subtotal > 0 && subtotal < 50 ? 5 : 0;
+  const shipping = subtotal > 0 && subtotal < 100 ? 50 : 0;
   const discountAmount = subtotal * discount;
   const total = subtotal + tax + shipping - discountAmount;
 
@@ -345,10 +345,10 @@ const Cart: React.FC = () => {
                     <p className="text-sm sm:text-base ">Size: {item.size}</p>
                   )}
                   <p className="text-sm sm:text-base">
-                    Unit Price: ${item.price.toFixed(2)}
+                    Unit Price: ₱{item.price.toFixed(2)}
                   </p>
                   <p className="text-sm sm:text-base ">
-                    Total: ${(item.price * item.quantity).toFixed(2)}
+                    Total: ₱{(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
                 <div className="absolute top-2 right-2 flex flex-col space-y-1 z-20">
@@ -456,21 +456,21 @@ const Cart: React.FC = () => {
             Order Summary
           </h3>
           <p className="text-lg text-[var(--color-secondary)]">
-            Subtotal: ${subtotal.toFixed(2)}
+            Subtotal: ₱{subtotal.toFixed(2)}
           </p>
           <p className="text-lg text-[var(--color-secondary)]">
-            Tax (10%): ${tax.toFixed(2)}
+            Tax (10%): ₱{tax.toFixed(2)}
           </p>
           <p className="text-lg text-[var(--color-secondary)]">
-            Shipping: ${shipping.toFixed(2)}
+            Shipping: ₱{shipping.toFixed(2)}
           </p>
           {discount > 0 && (
             <p className="text-lg text-green-600">
-              Discount: -${discountAmount.toFixed(2)}
+              Discount: - ₱{discountAmount.toFixed(2)}
             </p>
           )}
           <p className="text-2xl font-bold mt-4 text-[var(--color-secondary)]">
-            Total: ${total.toFixed(2)}
+            Total: ₱{total.toFixed(2)}
           </p>
           {/* Coupon Code Input */}
           <div className="mt-4 flex flex-col sm:flex-row">
@@ -508,9 +508,9 @@ const Cart: React.FC = () => {
               Proceed to Secure Checkout
             </button>
           </div>
-          {subtotal > 0 && subtotal < 50 && (
+          {subtotal > 0 && subtotal < 100 && (
             <p className="mt-4 text-sm text-[var(--color-secondary)]">
-              Free shipping on orders over $50!
+              Free shipping on orders over ₱100!
             </p>
           )}
         </div>
