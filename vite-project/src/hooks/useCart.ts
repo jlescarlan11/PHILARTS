@@ -26,6 +26,7 @@ export const useCart = (): {
   applyCoupon: (coupon: string) => number;
   setCartItems: Dispatch<SetStateAction<CartItem[]>>;
   getSubtotal: () => number;
+  getCartCount: () => number; // New function added here
 } => {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== "undefined") {
@@ -44,7 +45,7 @@ export const useCart = (): {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // ✅ Fixed: Updates quantity based on id, name, and size
+  // Updates quantity based on id, name, and size
   const updateQuantity = (
     id: string,
     name: string,
@@ -60,7 +61,7 @@ export const useCart = (): {
     );
   };
 
-  // ✅ Fixed: Removes item based on id, name, and size
+  // Removes item based on id, name, and size
   const removeItem = (id: string, name: string, size: string) => {
     setCartItems((prev) =>
       prev.filter(
@@ -69,12 +70,12 @@ export const useCart = (): {
     );
   };
 
-  // ✅ Fixed: Clears the cart
+  // Clears the cart
   const clearCart = () => {
     setCartItems([]);
   };
 
-  // ✅ Fixed: Saves an item for later based on id, name, and size
+  // Saves an item for later based on id, name, and size
   const saveForLater = (id: string, name: string, size: string) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -85,12 +86,12 @@ export const useCart = (): {
     );
   };
 
-  // ✅ Coupon logic remains the same
+  // Coupon logic remains the same
   const applyCoupon = (coupon: string): number => {
     return coupon.trim().toUpperCase() === "MATCHA10" ? 0.1 : 0;
   };
 
-  // ✅ Fixed: Adds to cart, ensuring merging of identical id, name, and size
+  // Adds to cart, ensuring merging of identical id, name, and size
   const addToCart = (item: CartItem) => {
     setCartItems((prev) => {
       const existing = prev.find(
@@ -108,9 +109,13 @@ export const useCart = (): {
     });
   };
 
-  // ✅ Computes subtotal based on item price and quantity
+  // Computes subtotal based on item price and quantity
   const getSubtotal = () =>
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  // Computes and returns the total cart count by summing up quantities
+  const getCartCount = () =>
+    cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
     cartItems,
@@ -123,5 +128,6 @@ export const useCart = (): {
     addToCart,
     setCartItems,
     getSubtotal,
+    getCartCount, // Now available for import in Navbar
   };
 };

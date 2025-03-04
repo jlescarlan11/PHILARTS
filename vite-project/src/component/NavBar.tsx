@@ -1,31 +1,35 @@
-// NavBar.tsx
-// Main navigation component integrating desktop navigation, the updated mobile bottom sheet,
-// and the compact sticky bottom navigation bar.
-// It manages active section detection and dark mode toggling, with improved ARIA and analytics.
+// Navbar.tsx
+// Main navigation component that integrates desktop navigation, the MobileMenu,
+// and the updated BottomNavBar (which now includes a dark mode toggle).
+// Additionally, an effect is added to listen for scroll and touchmove events,
+// forcing a re-render to ensure the cart count updates with every interaction.
 import React, { useState, useEffect, useCallback } from "react";
 import { HashLink } from "react-router-hash-link";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/logo.svg";
-import { useCart } from "../hooks/useCart";
 import useThrottle from "../utils/useThrottle";
 import NavItem from "./NavItem";
 import DarkModeToggle from "./DarkModeToggle";
 import MobileMenu from "./MobileMenu";
 import BottomNavBar from "./BottomNavBar";
 import { trackEvent } from "../utils/analytics";
+import { useCartContext } from "./CartContext";
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { cartItems } = useCart();
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const { getCartCount } = useCartContext();
+  const cartCount = getCartCount();
 
-  // State for active section and mobile menu control
+  // States for active section, mobile menu open state, and dark mode.
   const [activeSection, setActiveSection] = useState("hero");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+
+  // Dummy state to force re-renders so the cart count updates with every interaction.
+  const [, setDummy] = useState(0);
 
   // Navigation items (localized)
   const contentItems = [
@@ -36,7 +40,7 @@ const Navbar: React.FC = () => {
     { id: "contact", title: t("Contact"), url: "/#contact" },
   ];
 
-  // Structured data for SEO (breadcrumbs, publisher details)
+  // Structured data for SEO
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -61,7 +65,7 @@ const Navbar: React.FC = () => {
     },
   };
 
-  // Initialize dark mode from local storage or system preference.
+  // Initialize dark mode from localStorage or system preference.
   useEffect(() => {
     const savedPreference = localStorage.getItem("darkMode");
     const systemPrefersDark =
@@ -108,7 +112,7 @@ const Navbar: React.FC = () => {
     };
   }, [throttledIntersection]);
 
-  // Toggle mobile menu with ARIA announcements via analytics
+  // Toggle mobile menu (analytics integrated)
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => {
       const newState = !prev;
@@ -119,7 +123,7 @@ const Navbar: React.FC = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
-    trackEvent("mobile_menu_close", { source: "close_button" });
+    trackEvent("mobile_menu_close", { source: "overlay" });
   };
 
   const handleNavItemClick = (sectionId: string) => {
@@ -135,6 +139,19 @@ const Navbar: React.FC = () => {
       return newMode;
     });
   };
+
+  // Force a re-render on every scroll and touchmove so cart count updates.
+  useEffect(() => {
+    const updateDummy = () => {
+      setDummy((prev) => prev + 1);
+    };
+    window.addEventListener("scroll", updateDummy);
+    window.addEventListener("touchmove", updateDummy);
+    return () => {
+      window.removeEventListener("scroll", updateDummy);
+      window.removeEventListener("touchmove", updateDummy);
+    };
+  }, []);
 
   return (
     <>
@@ -269,9 +286,14 @@ const Navbar: React.FC = () => {
         toggleDarkMode={toggleDarkMode}
       />
 
-      {/* Sticky Bottom Navigation Bar for Mobile */}
+      {/* Compact Sticky Bottom Navigation Bar */}
       <div className="md:hidden">
-        <BottomNavBar cartCount={cartCount} navigate={navigate} />
+        <BottomNavBar
+          cartCount={cartCount}
+          navigate={navigate}
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+        />
       </div>
     </>
   );

@@ -1,14 +1,16 @@
-import React, { ErrorInfo, ReactNode } from "react";
+// ErrorBoundary.tsx
+import { Component, ErrorInfo, ReactNode } from "react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-class ErrorBoundary extends React.Component<
+export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
@@ -17,26 +19,22 @@ class ErrorBoundary extends React.Component<
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(_: Error): ErrorBoundaryState {
-    // Update state so the next render shows the fallback UI.
+  // Update state so the next render shows the fallback UI.
+  static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
     return { hasError: true };
   }
 
+  // You can also log the error to an error reporting service.
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // You can log the error to an error reporting service here.
     console.error("ErrorBoundary caught an error", error, errorInfo);
+    // Optionally report to an error logging service here
   }
 
   render() {
     if (this.state.hasError) {
-      return (
-        <div role="alert" className="p-4 bg-red-100 text-red-800">
-          Something went wrong.
-        </div>
-      );
+      // Render fallback UI
+      return this.props.fallback || <div>Something went wrong.</div>;
     }
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;

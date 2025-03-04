@@ -1,23 +1,47 @@
 // BottomNavBar.tsx
-// Refactored sticky bottom navigation bar with further reduced vertical padding for a compact layout.
-// Uses a minimal design with a consistent flex layout and micro-interactions on the key CTAs.
+// Redesigned sticky bottom navigation bar with a compact layout.
+// It now includes a dark mode toggle button, key CTAs ("Order Now" and "Cart"),
+// and micro-interaction effects for enhanced engagement.
 import React from "react";
 import { HashLink } from "react-router-hash-link";
-import { MdShoppingCart } from "react-icons/md";
+import { MdShoppingCart, MdDarkMode, MdLightMode } from "react-icons/md";
 import { trackEvent } from "../utils/analytics";
 
 interface BottomNavBarProps {
   cartCount: number;
   navigate: (path: string) => void;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
-const BottomNavBar: React.FC<BottomNavBarProps> = ({ cartCount, navigate }) => {
+const BottomNavBar: React.FC<BottomNavBarProps> = ({
+  cartCount,
+  navigate,
+  darkMode,
+  toggleDarkMode,
+}) => {
   return (
     <div
       role="navigation"
       aria-label="Bottom Navigation"
       className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner flex justify-around items-center py-1 z-40"
     >
+      {/* Dark mode toggle button added to the bottom nav */}
+      <button
+        onClick={() => {
+          toggleDarkMode();
+          trackEvent("bottom_nav_darkmode_toggle", { darkMode: !darkMode });
+        }}
+        className="p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 transition transform duration-200 hover:scale-105 hover:shadow-sm"
+        title="Toggle Dark Mode"
+      >
+        {darkMode ? (
+          <MdLightMode className="w-6 h-6" />
+        ) : (
+          <MdDarkMode className="w-6 h-6" />
+        )}
+      </button>
+
       <HashLink
         smooth
         to="/#products"
@@ -26,6 +50,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ cartCount, navigate }) => {
       >
         Order Now
       </HashLink>
+
       <button
         onClick={() => {
           trackEvent("bottom_nav_click", { section: "cart" });

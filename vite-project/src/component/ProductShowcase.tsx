@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "../assets/hero-image.webp";
-import { useCart } from "../hooks/useCart";
+// Instead of using useCart from hooks, we import useCartContext from the shared context.
+import { useCartContext } from "./CartContext";
 import { CartItem } from "../hooks/useCart";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { MdRemoveRedEye, MdShoppingCart } from "react-icons/md";
@@ -63,7 +64,6 @@ const products: Product[] = [
 // Uses the provided image URL (assumed to be .webp) and handles load errors.
 // On error, updates the error state so ARIA live regions can notify the user.
 const useResponsiveImage = (imageUrl: string) => {
-  // Use the URL as provided; no fallback is applied.
   const [src] = useState(imageUrl);
   const [error, setError] = useState(false);
   const handleError = () => {
@@ -73,10 +73,6 @@ const useResponsiveImage = (imageUrl: string) => {
   };
   return { src, handleError, error };
 };
-
-// -------------------------
-// Custom Hook: useCart
-// Manages cart state, persists it in localStorage, and stacks identical items.
 
 // -------------------------
 // Custom Hook: useFocusTrap
@@ -562,7 +558,8 @@ const ProductShowcase: React.FC = () => {
   const [showViewProductModal, setShowViewProductModal] = useState(false);
   const [showCartConfirmationModal, setShowCartConfirmationModal] =
     useState(false);
-  const { cartItems, addToCart, setCartItems } = useCart();
+  // Use the CartContext instead of directly using useCart.
+  const { cartItems, addToCart, setCartItems } = useCartContext();
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
@@ -664,7 +661,6 @@ const ProductShowcase: React.FC = () => {
 
   return (
     <section id="products" className="relative py-16 bg-[var(--color-primary)]">
-      {/* <MiniCartBadge cartCount={cartCount} /> */}
       <div className="container mx-auto px-4">
         <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-secondary)] text-center mb-8">
           Our Delicious Selections

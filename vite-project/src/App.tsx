@@ -12,47 +12,51 @@ import OrderConfirmation from "./component/OrderConfirmation";
 import ContactForm from "./component/ContactForm";
 import Footer from "./component/Footer";
 import ErrorPage from "./component/ErrorPage";
+import { CartProvider } from "./component/CartContext";
 
 const App: React.FC = () => {
   return (
     <Router>
-      <Navbar />
-      <main>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <div>
-                <section id="hero" className="-mt-[var(--nav-height)]">
-                  <HeroSection />
-                </section>
-                <section id="about">
-                  <AboutSection />
-                </section>
-                <section id="menu">
-                  <ProductShowcase />
-                </section>
-                <section id="testimonials">
-                  <TestimonialsSection />
-                </section>
-                <section id="faq">
-                  <FAQSection />
-                </section>
-                <section id="contact">
-                  <ContactForm />
-                </section>
-                <section id="footer">
-                  <Footer />
-                </section>
-              </div>
-            }
-          />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<SecureCheckout />} />
-          <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route path="*" element={<ErrorPage />} />
-        </Routes>
-      </main>
+      <CartProvider>
+        <Navbar />
+
+        <main>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div>
+                  <section id="hero" className="-mt-[var(--nav-height)]">
+                    <HeroSection />
+                  </section>
+                  <section id="about">
+                    <AboutSection />
+                  </section>
+                  <section id="menu">
+                    <ProductShowcase />
+                  </section>
+                  <section id="testimonials">
+                    <TestimonialsSection />
+                  </section>
+                  <section id="faq">
+                    <FAQSection />
+                  </section>
+                  <section id="contact">
+                    <ContactForm />
+                  </section>
+                  <section id="footer">
+                    <Footer />
+                  </section>
+                </div>
+              }
+            />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<SecureCheckout />} />
+            <Route path="/order-confirmation" element={<OrderConfirmation />} />
+            <Route path="*" element={<ErrorPage />} />
+          </Routes>
+        </main>
+      </CartProvider>
     </Router>
   );
 };

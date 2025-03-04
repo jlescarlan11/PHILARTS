@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CartItem, useCart } from "../hooks/useCart";
+import { CartItem } from "../hooks/useCart";
+// Use CartContext instead of useCart hook directly.
+import { useCartContext } from "./CartContext";
 import { HashLink } from "react-router-hash-link";
 import { IoMdEye, IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import {
@@ -165,7 +167,9 @@ const ViewProductModal: React.FC<{ item: CartItem; onClose: () => void }> = ({
 // Cart Component
 // Displays cart items as modern cards with background images and gradient overlays,
 // and a sticky checkout summary with conversion-focused CTAs.
+// Modified to use CartContext via useCartContext.
 const Cart: React.FC = () => {
+  // Use CartContext to get shared cart state and methods.
   const {
     cartItems,
     loading,
@@ -175,7 +179,7 @@ const Cart: React.FC = () => {
     saveForLater,
     applyCoupon,
     getSubtotal,
-  } = useCart();
+  } = useCartContext();
   const [toast, setToast] = useState<string>("");
   const [ariaAnnouncement, setAriaAnnouncement] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -225,7 +229,7 @@ const Cart: React.FC = () => {
     toggleBookmark(id);
     saveForLater(id, itemName, size);
     if (isBookmarked) {
-      showToast(`${itemName} is removed for later`);
+      showToast(`${itemName} is removed from favorites`);
       trackEvent("item_removed_from_saved", { itemName });
     } else {
       showToast(`${itemName} is added to favorites`);
@@ -522,7 +526,7 @@ const Cart: React.FC = () => {
           onConfirm={() => {
             clearCart();
             setShowConfirmModal(false);
-            showToast("Cart cleared");
+            setAriaAnnouncement("Cart cleared");
           }}
           onCancel={() => setShowConfirmModal(false)}
         />
