@@ -1,7 +1,6 @@
 // BottomNavBar.tsx
-// Redesigned sticky bottom navigation bar to be more compact and unobtrusive.
-// Vertical padding and overall height have been reduced, and a minimal design is used with a consistent flex layout.
-// Micro-interaction scaling on tap is applied to boost engagement without taking up excessive space.
+// Refactored sticky bottom navigation bar with further reduced vertical padding for a compact layout.
+// Uses a minimal design with a consistent flex layout and micro-interactions on the key CTAs.
 import React from "react";
 import { HashLink } from "react-router-hash-link";
 import { MdShoppingCart } from "react-icons/md";

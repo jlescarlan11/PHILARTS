@@ -235,3 +235,12 @@ body {
   font-weight: 900;
   font-style: italic;
 }
+
+/* Global CSS (e.g., styles.css) */
+.no-scroll {
+  overflow: hidden;
+  /* Optionally, if you experience issues on mobile browsers: */
+  height: 100%;
+  position: fixed;
+  width: 100%;
+}
