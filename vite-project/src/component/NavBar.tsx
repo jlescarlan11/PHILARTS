@@ -227,7 +227,7 @@ const Navbar: React.FC = () => {
                 <path d="M7 4h-2l-3 7v9a1 1 0 001 1h16a1 1 0 001-1v-9l-3-7h-2" />
               </svg>
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold rounded-full px-2">
+                <span className="absolute top-0 right-0 bg-red-600 text-[var(--color-primary)] text-xs font-bold rounded-full px-2">
                   {cartCount}
                 </span>
               )}

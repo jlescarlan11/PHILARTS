@@ -47,7 +47,7 @@ const TrackingModal: React.FC<TrackingModalProps> = ({
         <div className="mt-4 flex justify-end">
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2 bg-[var(--color-accent)] text-white rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full sm:w-auto px-5 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Close tracking modal"
           >
             Close
@@ -97,7 +97,7 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
       <div className="mt-4 flex justify-end">
         <button
           onClick={onConfirm}
-          className="w-full sm:w-auto px-5 py-2 bg-[var(--color-accent)] text-white rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          className="w-full sm:w-auto px-5 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           aria-label="Confirm order"
         >
           OK
@@ -295,7 +295,7 @@ const OrderConfirmation: React.FC = () => {
           </p>
           <button
             onClick={handleContinueShopping}
-            className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             aria-label="Continue shopping"
           >
             Continue Shopping

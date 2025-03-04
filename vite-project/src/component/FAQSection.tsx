@@ -334,7 +334,7 @@ const FAQSection: React.FC = () => {
           <HashLink
             smooth
             to="#contact"
-            className="inline-block px-6 sm:px-8 py-2 sm:py-3 bg-[var(--color-accent)] text-white rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
+            className="inline-block px-6 sm:px-8 py-2 sm:py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-[var(--color-secondary)]"
             aria-label="Still have questions? Contact us!"
           >
             Still have questions? Contact us!
