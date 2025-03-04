@@ -47,7 +47,7 @@ const products: Product[] = [
     name: "Nutcha Bites Deluxe",
     description:
       "Experience the Nutcha Bite Deluxe—a masterful fusion of time-honored flavors and a contemporary matcha twist. Delicately sprinkled with premium matcha, each bite unveils a harmonious blend of rich heritage and vibrant green tea essence, inviting you to savor an elevated, unforgettable treat.",
-    price: 35,
+    price: 45,
     image: "/images/product2", // assumed .webp
     sizes: [
       { label: "Regular", priceAdjustment: 0 },
