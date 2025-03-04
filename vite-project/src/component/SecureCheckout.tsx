@@ -796,7 +796,7 @@ const SecureCheckout: React.FC = () => {
                         className="text-sm sm:text-base text-[var(--color-secondary)]"
                       >
                         {item.name} {item.size && `(${item.size})`} – Qty:{" "}
-                        {item.quantity} – ${item.price.toFixed(2)} each
+                        {item.quantity} – ₱{item.price.toFixed(2)} each
                       </li>
                     ))}
                   </ul>

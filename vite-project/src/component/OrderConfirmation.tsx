@@ -364,7 +364,7 @@ const OrderConfirmation: React.FC = () => {
                   className="text-sm"
                 >
                   {item.name} {item.size && `(${item.size})`} – Qty:{" "}
-                  {item.quantity} – ${item.price.toFixed(2)} each
+                  {item.quantity} – ₱{item.price.toFixed(2)} each
                 </li>
               ))}
             </ul>
@@ -403,21 +403,21 @@ const OrderConfirmation: React.FC = () => {
               Pricing Summary
             </h2>
             <p className="text-sm text-[var(--color-secondary)]">
-              Subtotal: ${order.pricing.subtotal.toFixed(2)}
+              Subtotal: ₱{order.pricing.subtotal.toFixed(2)}
             </p>
             <p className="text-sm text-[var(--color-secondary)]">
-              Tax (10%): ${order.pricing.tax.toFixed(2)}
+              Tax (10%): ₱{order.pricing.tax.toFixed(2)}
             </p>
             <p className="text-sm text-[var(--color-secondary)]">
-              Shipping: ${order.pricing.shippingCost.toFixed(2)}
+              Shipping: ₱{order.pricing.shippingCost.toFixed(2)}
             </p>
             {order.pricing.discount > 0 && (
               <p className="text-sm text-green-600">
-                Discount: -${order.pricing.discountAmount.toFixed(2)}
+                Discount: -₱{order.pricing.discountAmount.toFixed(2)}
               </p>
             )}
             <p className="text-lg font-bold text-[var(--color-secondary)]">
-              Total: ${order.pricing.total.toFixed(2)}
+              Total: ₱{order.pricing.total.toFixed(2)}
             </p>
           </div>
           <div className="bg-[var(--color-primary)] border border-[var(--color-secondary)] rounded-md p-4">
