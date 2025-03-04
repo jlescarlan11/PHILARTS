@@ -30,7 +30,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   contentItems,
   cartCount,
   navigate,
-  darkMode,
 }) => {
   // State for tracking touch swipe distance and timing
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
