@@ -1,6 +1,7 @@
 // NavBar.tsx
-// Main navigation component integrating desktop navigation, the refined mobile bottom sheet,
-// and a sticky bottom navigation bar. Meta tags and active section detection are included.
+// Main navigation component integrating desktop navigation, the updated mobile bottom sheet,
+// and the compact sticky bottom navigation bar.
+// It manages active section detection and dark mode toggling, with improved ARIA and analytics.
 import React, { useState, useEffect, useCallback } from "react";
 import { HashLink } from "react-router-hash-link";
 import { useNavigate } from "react-router-dom";
@@ -21,12 +22,12 @@ const Navbar: React.FC = () => {
   const { cartItems } = useCart();
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // State for active section detection and mobile menu control
+  // State for active section and mobile menu control
   const [activeSection, setActiveSection] = useState("hero");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Navigation items using responsive design principles
+  // Navigation items (localized)
   const contentItems = [
     { id: "about", title: t("About"), url: "/#about" },
     { id: "menu", title: t("Menu"), url: "/#menu" },
@@ -35,7 +36,7 @@ const Navbar: React.FC = () => {
     { id: "contact", title: t("Contact"), url: "/#contact" },
   ];
 
-  // Structured data for SEO, including breadcrumbs and publisher details
+  // Structured data for SEO (breadcrumbs, publisher details)
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -60,7 +61,7 @@ const Navbar: React.FC = () => {
     },
   };
 
-  // Initialize dark mode based on local storage or system preference
+  // Initialize dark mode from local storage or system preference.
   useEffect(() => {
     const savedPreference = localStorage.getItem("darkMode");
     const systemPrefersDark =
@@ -76,7 +77,7 @@ const Navbar: React.FC = () => {
     localStorage.setItem("darkMode", darkMode.toString());
   }, [darkMode]);
 
-  // Active section detection using IntersectionObserver
+  // Active section detection using IntersectionObserver (with throttling)
   const handleIntersection = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const visibleSections = entries.filter(
@@ -107,7 +108,7 @@ const Navbar: React.FC = () => {
     };
   }, [throttledIntersection]);
 
-  // Toggle mobile menu with ARIA announcements for accessibility
+  // Toggle mobile menu with ARIA announcements via analytics
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => {
       const newState = !prev;

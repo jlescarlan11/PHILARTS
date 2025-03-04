@@ -1,7 +1,9 @@
 // MobileMenu.tsx
-// Refactored mobile bottom sheet modal with a minimal, modern design.
-// Uses a grid layout with ample whitespace, clear dividers, and a refined visual hierarchy.
-// Implements an elastic swipe-to-dismiss gesture with a subtle parallax offset and a tooltip hint.
+// Refactored mobile bottom sheet modal with a minimal and compact design.
+// - Uses ample white space and a consistent grid layout for spacing.
+// - Removes extra theme controls to simplify the UI.
+// - Implements a swipe-to-dismiss gesture with an elastic effect and optional subtle parallax,
+//   but also includes a clearly visible close button to avoid unintended page refreshes.
 import React, { useState } from "react";
 import FocusLock from "react-focus-lock";
 import { HashLink } from "react-router-hash-link";
@@ -32,33 +34,38 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   darkMode,
   toggleDarkMode,
 }) => {
-  // Swipe-to-dismiss states
+  // State for swipe-to-dismiss gesture
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [touchDeltaY, setTouchDeltaY] = useState(0);
+  // Record the time when the swipe starts to capture duration analytics
   const [swipeStartTime, setSwipeStartTime] = useState<number | null>(null);
-  const swipeThreshold = 120; // Minimum swipe distance to trigger dismissal
+  const swipeThreshold = 120; // Minimum swipe distance required for dismissal
 
-  // Show a subtle tooltip hint during swipe
+  // State to show a contextual tooltip (hint for dismissing)
   const [showTooltip, setShowTooltip] = useState(true);
 
-  // Record initial touch position and time
+  // Handle initial touch – record starting Y position and timestamp, and show tooltip.
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Prevent default behavior to avoid triggering native refresh.
+    e.preventDefault();
     setTouchStartY(e.touches[0].clientY);
     setSwipeStartTime(Date.now());
     setShowTooltip(true);
   };
 
-  // Apply an elastic effect with a subtle parallax offset during swipe
+  // Handle touch move with an elastic effect (with resistance) and optional parallax effect.
   const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent default to help block native refresh behavior.
+    e.preventDefault();
     if (touchStartY !== null) {
       const delta = e.touches[0].clientY - touchStartY;
-      // Apply resistance so that the movement feels elastic
+      // Only consider downward swipes and apply resistance
       setTouchDeltaY(delta > 0 ? delta * 0.5 : 0);
     }
   };
 
-  // On touch end, if the swipe exceeds the threshold, dismiss the menu.
-  // Also capture swipe analytics (distance and duration).
+  // On touch end, if the swipe distance is sufficient, dismiss the menu.
+  // Capture swipe analytics (distance and duration). Otherwise, reset.
   const handleTouchEnd = () => {
     const swipeDuration = swipeStartTime ? Date.now() - swipeStartTime : 0;
     if (touchDeltaY > swipeThreshold) {
@@ -75,7 +82,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
     setShowTooltip(false);
   };
 
-  // Calculate a parallax translation style with elastic easing.
+  // Calculate style for the menu translation with a subtle parallax effect.
   const menuStyle = {
     transform: isOpen ? `translateY(${touchDeltaY}px)` : "translateY(100%)",
     transition:
@@ -86,7 +93,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <>
-      {/* Blurred semi-transparent overlay */}
+      {/* Blurred overlay with semi-transparent background */}
       {isOpen && (
         <div
           onClick={closeMenu}
@@ -106,26 +113,36 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Expanded ARIA live region for detailed state feedback */}
+          {/* Expanded ARIA live region with detailed feedback */}
           <div aria-live="assertive" className="sr-only">
             {isOpen
-              ? "Mobile menu opened. Swipe down to dismiss."
+              ? "Mobile menu opened. Swipe down to dismiss, or tap the close button."
               : "Mobile menu closed."}
           </div>
 
-          {/* Drag indicator with subtle tooltip hint */}
-          <div className="flex flex-col items-center py-2">
-            <div className="w-12 h-1 bg-gray-400 rounded-full mb-1" />
-            {showTooltip && (
-              <span className="text-xs text-gray-500">
-                Swipe down to dismiss
-              </span>
-            )}
+          {/* Header area with a drag indicator and a clearly visible close button */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-1 bg-gray-400 rounded-full" />
+              {showTooltip && (
+                <span className="text-xs text-gray-500">
+                  Swipe down to dismiss
+                </span>
+              )}
+            </div>
+            {/* Close button as a fallback to prevent unintended refresh */}
+            <button
+              onClick={closeMenu}
+              aria-label="Close menu"
+              className="text-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              &times;
+            </button>
           </div>
 
-          {/* Main content layout using grid for consistent spacing */}
+          {/* Content area using grid for spacing and clear visual dividers */}
           <div className="px-6 py-4 grid gap-6">
-            {/* Navigation items with clear visual dividers */}
+            {/* Navigation items */}
             <ul
               className="grid gap-4 border-b border-gray-300 pb-4"
               role="menu"
@@ -142,22 +159,15 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               ))}
             </ul>
 
-            {/* CTA area with dark mode toggle and key actions */}
+            {/* CTAs – only key actions remain (no extra theme controls) */}
             <div className="grid gap-4">
-              <div className="flex items-center justify-between">
-                <DarkModeToggle
-                  darkMode={darkMode}
-                  toggleDarkMode={toggleDarkMode}
-                />
-                {/* Removed theme controls entirely for simplified dark mode logic */}
-              </div>
               <button
                 title="Go to Cart"
                 onClick={() => {
                   closeMenu();
                   navigate("/cart");
                 }}
-                className="w-full py-3 rounded bg-red-600 text-white font-bold focus:outline-none focus:ring-4 focus:ring-red-500 transition transform duration-200 hover:scale-105 hover:shadow-lg"
+                className="w-full py-3 rounded bg-red-600 text-white font-bold focus:outline-none focus:ring-3 focus:ring-red-500 transition transform hover:scale-105 shadow-lg"
               >
                 Cart {cartCount > 0 && `(${cartCount})`}
               </button>
@@ -166,7 +176,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 to="/#products"
                 onClick={() => handleNavItemClick("order")}
                 title="Order Now"
-                className="block text-center w-full py-3 rounded bg-green-600 text-white font-bold focus:outline-none focus:ring-4 focus:ring-green-500 transition transform duration-200 hover:scale-105 hover:shadow-lg"
+                className="block text-center w-full py-3 rounded bg-green-600 text-white font-bold focus:outline-none focus:ring-3 focus:ring-green-500 transition transform hover:scale-105 shadow-lg"
               >
                 Order Now
               </HashLink>

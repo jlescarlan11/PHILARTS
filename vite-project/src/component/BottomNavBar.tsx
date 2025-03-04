@@ -1,7 +1,6 @@
 // BottomNavBar.tsx
-// Sticky bottom navigation bar that emphasizes key CTAs with enlarged buttons,
-// bold contrasting colors, and micro-interactions (scaling and shadow effects) on tap.
-// This component is separate from the mobile menu, ensuring key actions are always visible.
+// Refactored sticky bottom navigation bar for mobile with reduced height for a more compact look.
+// Key CTAs ("Order Now" and "Cart") are prominently displayed with bold colors and micro-interactions.
 import React from "react";
 import { HashLink } from "react-router-hash-link";
 import { MdShoppingCart } from "react-icons/md";
@@ -17,13 +16,13 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ cartCount, navigate }) => {
     <div
       role="navigation"
       aria-label="Bottom Navigation"
-      className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner flex justify-around items-center py-4 z-40"
+      className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner flex justify-around items-center py-2 z-40"
     >
       <HashLink
         smooth
         to="/#products"
         onClick={() => trackEvent("bottom_nav_click", { section: "order" })}
-        className="text-xl font-bold px-6 py-3 rounded bg-green-800 text-white transition transform duration-200 hover:scale-105 hover:shadow-lg"
+        className="text-lg font-bold px-4 py-2 rounded bg-green-700 text-white transition transform duration-200 hover:scale-105 hover:shadow-md"
       >
         Order Now
       </HashLink>
@@ -32,7 +31,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ cartCount, navigate }) => {
           trackEvent("bottom_nav_click", { section: "cart" });
           navigate("/cart");
         }}
-        className="relative p-3 focus:outline-none focus:ring-4 focus:ring-red-500 transition transform duration-200 hover:scale-105 hover:shadow-lg"
+        className="relative p-2 focus:outline-none focus:ring-3 focus:ring-red-500 transition transform duration-200 hover:scale-105 hover:shadow-md"
         title="View Cart"
       >
         <MdShoppingCart className="w-8 h-8" />
