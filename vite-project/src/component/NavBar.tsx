@@ -194,7 +194,7 @@ const Navbar: React.FC = () => {
                 alt="Nutcha Bite logo"
                 className="h-8 w-auto transition-transform duration-300 ease-in-out transform hover:scale-105"
               />
-              <h1 className="text-xl md:text-2xl font-bold text-[var(--color-tertiary)]">
+              <h1 className="text-xl md:text-2xl font-bold shrikhand-regular  text-[var(--color-tertiary)]">
                 NUTCHA BITES
               </h1>
             </HashLink>
