@@ -501,8 +501,13 @@ const Cart: React.FC = () => {
               Go to Menu
             </HashLink>
             <button
-              onClick={handleCheckout}
-              className="w-full sm:w-auto px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)]"
+              onClick={groupedItems.length > 0 ? handleCheckout : undefined}
+              disabled={groupedItems.length === 0}
+              className={`w-full sm:w-auto px-6 py-3 rounded-lg text-[var(--color-primary)] transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] ${
+                groupedItems.length === 0
+                  ? "bg-[var(--color-accent-40)] cursor-not-allowed"
+                  : "bg-[var(--color-accent)] hover:bg-opacity-90"
+              }`}
               aria-label="Proceed to Secure Checkout"
             >
               Proceed to Secure Checkout
