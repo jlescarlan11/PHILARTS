@@ -7,6 +7,7 @@ import {
   MdPlayArrow,
   MdShare,
 } from "react-icons/md";
+import review1 from "../assets/review1.jpg";
 
 /* -------------------------------------------------------
    Type Definitions
@@ -28,8 +29,8 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "John Doe",
-    photo: "/images/customer1.jpg",
+    name: "Jen Jr.",
+    photo: `${review1}`,
     rating: 5,
     review:
       "Nutcha Bite is simply amazing! The fusion of tradition and matcha flavor is unique and unforgettable. I love every bite!",
