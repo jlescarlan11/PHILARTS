@@ -8,6 +8,8 @@ import {
   MdShare,
 } from "react-icons/md";
 import review1 from "../assets/review1.jpg";
+import review2 from "../assets/review2.jpg";
+import review3 from "../assets/review3.jpg";
 
 /* -------------------------------------------------------
    Type Definitions
@@ -42,8 +44,8 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 2,
-    name: "Jane Smith",
-    photo: "/images/customer2.jpg",
+    name: "Doggie",
+    photo: `${review2}`,
     rating: 4,
     review:
       "A delightful twist on a classic favorite. The subtle matcha notes really elevate the flavor. Highly recommended!",
@@ -55,8 +57,8 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 3,
-    name: "Robert Lee",
-    photo: "/images/customer3.jpg",
+    name: "Mewie",
+    photo: `${review3}`,
     rating: 5,
     review:
       "The perfect combination of flavors that truly captures the essence of Iloilo. This is a must-try delicacy!",
