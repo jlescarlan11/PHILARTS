@@ -211,7 +211,7 @@ const HeroSection: React.FC = () => {
           </p>
           <HashLink
             smooth
-            to="#order"
+            to="#menu"
             title="Order Now"
             onClick={() =>
               trackEvent("cta_click", {
