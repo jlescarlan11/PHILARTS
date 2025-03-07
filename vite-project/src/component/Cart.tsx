@@ -515,7 +515,7 @@ const Cart: React.FC = () => {
           </div>
           {subtotal > 0 && subtotal < 100 && (
             <p className="mt-4 text-sm text-[var(--color-secondary)]">
-              Free shippin on orders over ₱100!
+              Free shipping on orders over ₱100!
             </p>
           )}
         </div>
